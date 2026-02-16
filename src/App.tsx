@@ -13,6 +13,7 @@ import CustomerLayout from "@/components/layout/CustomerLayout";
 import VendorLayout from "@/components/layout/VendorLayout";
 import AdminLayout from "@/components/layout/AdminLayout";
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Auth
 import LoginPage from "@/pages/auth/LoginPage";
@@ -32,6 +33,8 @@ import OrderTrackingPage from "@/pages/OrderTrackingPage";
 import ProfilePage from "@/pages/ProfilePage";
 import AboutPage from "@/pages/AboutPage";
 import FAQPage from "@/pages/FAQPage";
+import ContactPage from "@/pages/ContactPage";
+import TermsPage from "@/pages/TermsPage";
 import VendorStorePage from "@/pages/VendorStorePage";
 
 // Vendor pages
@@ -61,75 +64,79 @@ const App = () => (
                             <Toaster />
                             <Sonner />
                             <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-                                <Routes>
-                                    {/* Public Auth Routes */}
-                                    <Route path="/login" element={<LoginPage />} />
-                                    <Route path="/register" element={<RegisterPage />} />
-                                    <Route path="/admin/login" element={<AdminLoginPage />} />
-                                    <Route path="/pastane/kayit" element={<VendorOnboardingPage />} />
+                                <ErrorBoundary>
+                                    <Routes>
+                                        {/* Public Auth Routes */}
+                                        <Route path="/login" element={<LoginPage />} />
+                                        <Route path="/register" element={<RegisterPage />} />
+                                        <Route path="/admin/login" element={<AdminLoginPage />} />
+                                        <Route path="/pastane/kayit" element={<VendorOnboardingPage />} />
 
-                                    {/* Customer Routes (Some public, some protected) */}
-                                    <Route element={<CustomerLayout />}>
-                                        <Route path="/" element={<HomePage />} />
-                                        <Route path="/sablonlar" element={<TemplatesPage />} />
-                                        <Route path="/sablonlar/:id" element={<TemplateDetailPage />} />
-                                        <Route path="/tasarla" element={<DesignWizardPage />} />
-                                        <Route path="/magaza/:id" element={<VendorStorePage />} />
+                                        {/* Customer Routes (Some public, some protected) */}
+                                        <Route element={<CustomerLayout />}>
+                                            <Route path="/" element={<HomePage />} />
+                                            <Route path="/tasarimlar" element={<TemplatesPage />} />
+                                            <Route path="/tasarimlar/:id" element={<TemplateDetailPage />} />
+                                            <Route path="/tasarla" element={<DesignWizardPage />} />
+                                            <Route path="/magaza/:id" element={<VendorStorePage />} />
 
-                                        {/* Protected Customer Routes */}
-                                        <Route path="/sepet" element={<CartPage />} />
-                                        <Route path="/odeme" element={<CheckoutPage />} />
-                                        <Route path="/taleplerim" element={
-                                            <ProtectedRoute allowedRoles={['customer']}>
-                                                <RequestsPage />
+                                            {/* Protected Customer Routes */}
+                                            <Route path="/sepet" element={<CartPage />} />
+                                            <Route path="/odeme" element={<CheckoutPage />} />
+                                            <Route path="/taleplerim" element={
+                                                <ProtectedRoute allowedRoles={['customer']}>
+                                                    <RequestsPage />
+                                                </ProtectedRoute>
+                                            } />
+                                            <Route path="/taleplerim/:id" element={
+                                                <ProtectedRoute allowedRoles={['customer']}>
+                                                    <RequestDetailPage />
+                                                </ProtectedRoute>
+                                            } />
+                                            <Route path="/siparis/:id" element={
+                                                <ProtectedRoute allowedRoles={['customer', 'vendor', 'admin']}>
+                                                    <OrderTrackingPage />
+                                                </ProtectedRoute>
+                                            } />
+                                            <Route path="/profil" element={
+                                                <ProtectedRoute allowedRoles={['customer']}>
+                                                    <ProfilePage />
+                                                </ProtectedRoute>
+                                            } />
+                                            <Route path="/hakkimizda" element={<AboutPage />} />
+                                            <Route path="/sss" element={<FAQPage />} />
+                                            <Route path="/iletisim" element={<ContactPage />} />
+                                            <Route path="/kullanim-kosullari" element={<TermsPage />} />
+                                        </Route>
+
+                                        {/* Protected Vendor Routes */}
+                                        <Route path="/pastane" element={
+                                            <ProtectedRoute allowedRoles={['vendor']}>
+                                                <VendorLayout />
                                             </ProtectedRoute>
-                                        } />
-                                        <Route path="/taleplerim/:id" element={
-                                            <ProtectedRoute allowedRoles={['customer']}>
-                                                <RequestDetailPage />
-                                            </ProtectedRoute>
-                                        } />
-                                        <Route path="/siparis/:id" element={
-                                            <ProtectedRoute allowedRoles={['customer', 'vendor', 'admin']}>
-                                                <OrderTrackingPage />
-                                            </ProtectedRoute>
-                                        } />
-                                        <Route path="/profil" element={
-                                            <ProtectedRoute allowedRoles={['customer']}>
-                                                <ProfilePage />
-                                            </ProtectedRoute>
-                                        } />
-                                        <Route path="/hakkimizda" element={<AboutPage />} />
-                                        <Route path="/sss" element={<FAQPage />} />
-                                    </Route>
+                                        }>
+                                            <Route index element={<Navigate to="/pastane/panel" replace />} />
+                                            <Route path="panel" element={<VendorDashboardPage />} />
+                                            <Route path="talep/:id" element={<VendorRequestDetailPage />} />
+                                            <Route path="siparisler" element={<VendorOrdersPage />} />
+                                            <Route path="finans" element={<VendorFinancePage />} />
+                                            <Route path="urunler" element={<VendorProductsPage />} />
+                                            <Route path="urun-ekle" element={<VendorAddProductPage />} />
+                                            <Route path="ayarlar" element={<VendorSettingsPage />} />
+                                        </Route>
 
-                                    {/* Protected Vendor Routes */}
-                                    <Route path="/pastane" element={
-                                        <ProtectedRoute allowedRoles={['vendor']}>
-                                            <VendorLayout />
-                                        </ProtectedRoute>
-                                    }>
-                                        <Route index element={<Navigate to="/pastane/panel" replace />} />
-                                        <Route path="panel" element={<VendorDashboardPage />} />
-                                        <Route path="talep/:id" element={<VendorRequestDetailPage />} />
-                                        <Route path="siparisler" element={<VendorOrdersPage />} />
-                                        <Route path="finans" element={<VendorFinancePage />} />
-                                        <Route path="urunler" element={<VendorProductsPage />} />
-                                        <Route path="urun-ekle" element={<VendorAddProductPage />} />
-                                        <Route path="ayarlar" element={<VendorSettingsPage />} />
-                                    </Route>
+                                        {/* Protected Admin Routes */}
+                                        <Route path="/admin" element={
+                                            <ProtectedRoute allowedRoles={['admin']}>
+                                                <AdminLayout />
+                                            </ProtectedRoute>
+                                        }>
+                                            <Route index element={<AdminDashboardPage />} />
+                                        </Route>
 
-                                    {/* Protected Admin Routes */}
-                                    <Route path="/admin" element={
-                                        <ProtectedRoute allowedRoles={['admin']}>
-                                            <AdminLayout />
-                                        </ProtectedRoute>
-                                    }>
-                                        <Route index element={<AdminDashboardPage />} />
-                                    </Route>
-
-                                    <Route path="*" element={<NotFound />} />
-                                </Routes>
+                                        <Route path="*" element={<NotFound />} />
+                                    </Routes>
+                                </ErrorBoundary>
                             </BrowserRouter>
                         </TooltipProvider>
                     </OrdersProvider>

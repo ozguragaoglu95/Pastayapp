@@ -90,7 +90,7 @@ const TemplateDetail = () => {
         return (
             <div className="flex flex-col items-center justify-center px-4 py-20">
                 <p className="text-muted-foreground">Ürün bulunamadı.</p>
-                <Button variant="outline" className="mt-4" onClick={() => navigate("/sablonlar")}>
+                <Button variant="outline" className="mt-4" onClick={() => navigate("/tasarimlar")}>
                     Geri dön
                 </Button>
             </div>
@@ -177,108 +177,74 @@ const TemplateDetail = () => {
                         <p className="mt-0.5 text-xs font-semibold">{template.prepTimeDays} gün</p>
                     </div>
                 </div>
-            </div>
 
-            {/* Selection Groups */}
-            <div className="mt-6 px-4 space-y-8">
-                {/* 1. Theme Selection */}
-                <div className="space-y-3">
-                    <Label className="text-base font-bold flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-primary" /> Pasta Teması
-                    </Label>
-                    <div className="grid grid-cols-2 gap-2">
-                        {["Doğum Günü", "Düğün / Nişan", "Kutlama", "Baby Shower", "Yıl Dönümü", "Diğer"].map((t) => (
-                            <button
-                                key={t}
-                                onClick={() => setTheme(t)}
-                                className={`px-4 py-3 rounded-xl border-2 text-xs font-bold transition-all ${theme === t ? "border-primary bg-primary/5 text-primary" : "border-slate-100 bg-white text-slate-500 hover:border-slate-200"
-                                    }`}
-                            >
-                                {t}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* 2. Recipient Selection */}
-                <div className="space-y-3">
-                    <Label className="text-base font-bold flex items-center gap-2">
-                        <Users className="h-4 w-4 text-primary" /> Pastanın Kime Yapılacağı?
-                    </Label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {["Eş / Sevgili", "Aile", "Arkadaş", "Akraba", "Çocuk / Bebek", "Diğer"].map((r) => (
-                            <button
-                                key={r}
-                                onClick={() => setRecipient(r)}
-                                className={`px-4 py-3 rounded-xl border-2 text-xs font-bold transition-all ${recipient === r ? "border-primary bg-primary/5 text-primary" : "border-slate-100 bg-white text-slate-500 hover:border-slate-200"
-                                    }`}
-                            >
-                                {r}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* 3. Portions Selection */}
-                <div className="space-y-3">
-                    <Label className="text-base font-bold flex items-center gap-2">
-                        <Plus className="h-4 w-4 text-primary" /> Kaç Kişilik?
-                    </Label>
-                    <div className="flex gap-2">
-                        {["6-10", "10-15", "15+"].map((p) => {
-                            const isSelected = (p === "6-10" && quantity < 10) || (p === "10-15" && quantity >= 10 && quantity < 15) || (p === "15+" && quantity >= 15);
-                            let priceDiff = 0;
-                            if (p === "10-15") priceDiff = 150;
-                            if (p === "15+") priceDiff = 300;
-
-                            return (
+                {/* Selection Groups */}
+                <div className="mt-6 px-4 space-y-8">
+                    {/* 1. Theme Selection */}
+                    <div className="space-y-3">
+                        <Label className="text-base font-bold flex items-center gap-2">
+                            <Sparkles className="h-4 w-4 text-primary" /> Pasta Teması
+                        </Label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {["Doğum Günü", "Düğün / Nişan", "Kutlama", "Baby Shower", "Yıl Dönümü", "Diğer"].map((t) => (
                                 <button
-                                    key={p}
-                                    onClick={() => setQuantity(p === "6-10" ? 8 : (p === "10-15" ? 12 : 20))}
-                                    className={`flex-1 px-2 py-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${isSelected ? "border-primary bg-primary/5 text-primary" : "border-slate-100 bg-white text-slate-500"
+                                    key={t}
+                                    onClick={() => setTheme(t)}
+                                    className={`px-4 py-3 rounded-xl border-2 text-xs font-bold transition-all ${theme === t ? "border-primary bg-primary/5 text-primary" : "border-slate-100 bg-white text-slate-500 hover:border-slate-200"
                                         }`}
                                 >
-                                    <span className="text-xs font-black">{p}</span>
-                                    {priceDiff > 0 && <span className="text-[9px] font-bold opacity-70">+{priceDiff}₺</span>}
+                                    {t}
                                 </button>
-                            );
-                        })}
+                            ))}
+                        </div>
                     </div>
-                </div>
 
-                {/* Allergy Warning */}
-                <div className="space-y-3">
-                    <button
-                        onClick={() => setHasAllergy(!hasAllergy)}
-                        className={`w-full flex items-center justify-between p-4 rounded-2xl border-2 transition-all ${hasAllergy ? "bg-red-50 border-red-200" : "bg-white border-slate-100"
-                            }`}
-                        type="button"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-xl transition-colors ${hasAllergy ? "bg-red-500" : "bg-slate-100"}`}>
-                                <AlertCircle className={`h-5 w-5 ${hasAllergy ? "text-white" : "text-slate-400"}`} />
-                            </div>
-                            <div className="text-left">
-                                <p className={`text-sm font-black ${hasAllergy ? "text-red-900" : "text-slate-700"}`}>Alerjim Var*</p>
-                                <p className="text-[10px] text-muted-foreground">Gıda duyarlılığınız varsa lütfen belirtin.</p>
-                            </div>
+                    {/* 2. Recipient Selection */}
+                    <div className="space-y-3">
+                        <Label className="text-base font-bold flex items-center gap-2">
+                            <Users className="h-4 w-4 text-primary" /> Pastanın Kime Yapılacağı?
+                        </Label>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            {["Eş / Sevgili", "Aile", "Arkadaş", "Akraba", "Çocuk / Bebek", "Diğer"].map((r) => (
+                                <button
+                                    key={r}
+                                    onClick={() => setRecipient(r)}
+                                    className={`px-4 py-3 rounded-xl border-2 text-xs font-bold transition-all ${recipient === r ? "border-primary bg-primary/5 text-primary" : "border-slate-100 bg-white text-slate-500 hover:border-slate-200"
+                                        }`}
+                                >
+                                    {r}
+                                </button>
+                            ))}
                         </div>
-                        <div className={`w-10 h-6 rounded-full relative transition-colors ${hasAllergy ? "bg-red-500" : "bg-slate-200"}`}>
-                            <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${hasAllergy ? "left-5" : "left-1"}`} />
-                        </div>
-                    </button>
+                    </div>
 
-                    {hasAllergy && (
-                        <div className="animate-in slide-in-from-top-2 duration-300">
-                            <Textarea
-                                placeholder="Lütfen alerjinizi belirtin (Örn: Yer fıstığı, Çilek vb. - Maks 500 karakter)"
-                                maxLength={500}
-                                className="rounded-xl border-red-200 focus:ring-red-500 focus:border-red-500 min-h-[120px] bg-white text-sm"
-                                value={allergyInfo}
-                                onChange={(e) => setAllergyInfo(e.target.value)}
-                            />
+                    {/* 3. Portions Selection */}
+                    <div className="space-y-3">
+                        <Label className="text-base font-bold flex items-center gap-2">
+                            <Plus className="h-4 w-4 text-primary" /> Kaç Kişilik?
+                        </Label>
+                        <div className="flex gap-2">
+                            {["6-10", "10-15", "15+"].map((p) => {
+                                const isSelected = (p === "6-10" && quantity < 10) || (p === "10-15" && quantity >= 10 && quantity < 15) || (p === "15+" && quantity >= 15);
+                                let priceDiff = 0;
+                                if (p === "10-15") priceDiff = 150;
+                                if (p === "15+") priceDiff = 300;
+
+                                return (
+                                    <button
+                                        key={p}
+                                        onClick={() => setQuantity(p === "6-10" ? 8 : (p === "10-15" ? 12 : 20))}
+                                        className={`flex-1 px-2 py-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${isSelected ? "border-primary bg-primary/5 text-primary" : "border-slate-100 bg-white text-slate-500"
+                                            }`}
+                                    >
+                                        <span className="text-xs font-black">{p}</span>
+                                        {priceDiff > 0 && <span className="text-[9px] font-bold opacity-70">+{priceDiff}₺</span>}
+                                    </button>
+                                );
+                            })}
                         </div>
-                    )}
+                    </div>
+
                 </div>
             </div>
 
@@ -296,14 +262,14 @@ const TemplateDetail = () => {
                         className="gap-2 rounded-full font-black flex-1 max-w-[200px] shadow-lg shadow-primary/20 h-14 bg-slate-900 hover:bg-slate-800 text-white"
                         asChild
                     >
-                        <Link to={`/tasarla?template=${template.id}&vendor=${vendor.id}&recipient=${recipient}&theme=${theme}&portions=${quantity <= 10 ? "6-10" : (quantity <= 15 ? "10-15" : "15+")}&allergy=${hasAllergy ? encodeURIComponent(allergyInfo) : ""}`}>
+                        <Link to={`/tasarla?reset=true&template=${template.id}&vendor=${vendor.id}&recipient=${recipient}&theme=${theme}&portions=${quantity <= 10 ? "6-10" : (quantity <= 15 ? "10-15" : "15+")}`}>
                             <Sparkles className="h-5 w-5 text-yellow-400" />
                             Tasarla 🎂
                         </Link>
                     </Button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

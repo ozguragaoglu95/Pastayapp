@@ -34,7 +34,7 @@ export default function Header() {
                     {/* Public Nav */}
                     {!user && (
                         <nav className="hidden md:flex gap-4 mr-4 text-sm font-medium text-muted-foreground">
-                            <Link to="/sablonlar" className="hover:text-primary transition-colors">Şablonlar</Link>
+                            <Link to="/tasarimlar" className="hover:text-primary transition-colors">Tasarımlar</Link>
                             <Link to="/tasarla" className="hover:text-primary transition-colors">Tasarla</Link>
                         </nav>
                     )}

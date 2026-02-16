@@ -7,7 +7,7 @@ import { mockTemplates } from '@/data/mock-templates';
 import { mockVendors } from '@/data/mock-vendors';
 
 const steps = [
-    { icon: PenTool, title: 'Tasarla', desc: 'Hayalindeki pastayı tarif et veya şablondan seç' },
+    { icon: PenTool, title: 'Tasarla', desc: 'Hayalindeki pastayı tarif et veya hazır tasarımlardan seç' },
     { icon: Send, title: 'Teklif Al', desc: "İstanbul'un en iyi pastanelerinden fiyat teklifi al" },
     { icon: Package, title: 'Teslim Al', desc: 'Özel pastanı kapında veya mağazadan teslim al' },
 ];
@@ -30,10 +30,10 @@ export default function HomePage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
                         <Button asChild size="lg" className="rounded-full bg-white text-primary hover:bg-slate-50 font-bold px-8 h-14 shadow-xl">
-                            <Link to="/tasarla">Hemen Tasarla</Link>
+                            <Link to="/tasarla?reset=true">Hemen Tasarla</Link>
                         </Button>
                         <Button asChild variant="outline" size="lg" className="rounded-full bg-white/10 border-white/20 text-white hover:bg-white/20 font-bold px-8 h-14 backdrop-blur-sm">
-                            <Link to="/sablonlar">Şablonları Keşfet</Link>
+                            <Link to="/tasarimlar">Tasarımları Keşfet</Link>
                         </Button>
                     </div>
                 </div>
@@ -87,18 +87,18 @@ export default function HomePage() {
             <section className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="font-display text-2xl font-black">Popüler Şablonlar</h2>
+                        <h2 className="font-display text-2xl font-black">Popüler Tasarımlar</h2>
                         <p className="text-muted-foreground text-xs mt-1">Sizin için seçtiğimiz en favori tasarımlar.</p>
                     </div>
                     <Button asChild variant="ghost" className="rounded-full font-bold text-primary">
-                        <Link to="/sablonlar">Tümünü Gör</Link>
+                        <Link to="/tasarimlar">Tümünü Gör</Link>
                     </Button>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {featured.map(t => {
                         const vendor = mockVendors.find(v => v.id === t.vendorId);
                         return (
-                            <Link key={t.id} to={`/sablonlar/${t.id}`}>
+                            <Link key={t.id} to={`/tasarimlar/${t.id}`}>
                                 <Card className="overflow-hidden border-0 bg-white shadow-md hover:shadow-xl transition-all group rounded-2xl">
                                     <div className="aspect-[4/5] relative overflow-hidden">
                                         <img

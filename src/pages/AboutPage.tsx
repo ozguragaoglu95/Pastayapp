@@ -72,7 +72,7 @@ const AboutPage = () => {
                     <Button
                         size="lg"
                         className="rounded-full px-8 shadow-xl shadow-primary/20"
-                        onClick={() => navigate("/sablonlar")}
+                        onClick={() => navigate("/tasarimlar")}
                     >
                         Pastaları Keşfet
                     </Button>

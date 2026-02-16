@@ -1,16 +1,17 @@
 import { createContext, useContext, useState, ReactNode, useCallback } from "react";
-import { CustomRequest } from "@/types";
+import { CustomRequest, CustomRequestSpec } from "@/types";
 import { mockRequests } from "@/data/mock-requests";
 
 import { Offer } from "@/types";
 
 interface RequestsContextType {
     requests: CustomRequest[];
-    addRequest: (request: Omit<CustomRequest, "id" | "createdAt" | "status" | "offers">) => void;
+    addRequest: (request: Omit<CustomRequest, "id" | "createdAt" | "status" | "offers">) => CustomRequest;
     addOffer: (requestId: string, offer: Omit<Offer, "id" | "createdAt" | "requestId" | "vendorId">) => void;
     updateRequestStatus: (id: string, status: import("@/types").RequestStatus, selectedOfferId?: string) => void;
     getRequestById: (id: string) => CustomRequest | undefined;
     sendMessage: (requestId: string, text: string, senderId: string, role: import("@/types").UserRole) => void;
+    updateRequestSpec: (id: string, spec: CustomRequestSpec) => void;
 }
 
 const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
@@ -47,6 +48,7 @@ export const RequestsProvider = ({ children }: { children: ReactNode }) => {
             ...newRequestData,
         };
         setRequests((prev) => [newRequest, ...prev]);
+        return newRequest;
     }, []);
 
     const updateRequestStatus = useCallback((id: string, status: import("@/types").RequestStatus, selectedOfferId?: string) => {
@@ -83,8 +85,12 @@ export const RequestsProvider = ({ children }: { children: ReactNode }) => {
         return requests.find((req) => req.id === id);
     }, [requests]);
 
+    const updateRequestSpec = useCallback((id: string, spec: CustomRequestSpec) => {
+        setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, spec } : req)));
+    }, []);
+
     return (
-        <RequestsContext.Provider value={{ requests, addRequest, addOffer, updateRequestStatus, getRequestById, sendMessage }}>
+        <RequestsContext.Provider value={{ requests, addRequest, addOffer, updateRequestStatus, getRequestById, sendMessage, updateRequestSpec }}>
             {children}
         </RequestsContext.Provider>
     );

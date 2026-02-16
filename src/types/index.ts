@@ -98,6 +98,7 @@ export interface CustomRequestSpec {
     productTheme?: string; // New: User-defined theme on product page
     allergyInfo?: string; // New: Allergy information
     customOptions?: Record<string, string>; // New: Free text for 'Özel' options in wizard (groupId -> text)
+    productThemeCustom?: string; // New: Free text for 'Other' theme
 }
 
 export type RequestStatus = 'pending' | 'draft' | 'waiting_offers' | 'offers_received' | 'offer_selected' | 'agreed' | 'in_progress' | 'ready' | 'delivered' | 'cancelled';

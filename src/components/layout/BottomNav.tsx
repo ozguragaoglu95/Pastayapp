@@ -3,7 +3,7 @@ import { Home, Search, PlusCircle, ClipboardList, User } from 'lucide-react';
 
 const navItems = [
     { to: '/', icon: Home, label: 'Ana Sayfa' },
-    { to: '/sablonlar', icon: Search, label: 'Şablonlar' },
+    { to: '/tasarimlar', icon: Search, label: 'Tasarımlar' },
     { to: '/tasarla', icon: PlusCircle, label: 'Tasarla' },
     { to: '/taleplerim', icon: ClipboardList, label: 'Taleplerim' },
     { to: '/profil', icon: User, label: 'Profil' },

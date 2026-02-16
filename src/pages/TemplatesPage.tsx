@@ -50,7 +50,8 @@ export default function TemplatesPage() {
 
     // Filtering Logic
     const filteredProducts = useMemo(() => {
-        let result = mockTemplateProducts;
+        if (!mockTemplateProducts) return [];
+        let result = [...mockTemplateProducts];
 
         // Search
         if (searchQuery) {
@@ -85,25 +86,22 @@ export default function TemplatesPage() {
         );
 
         // Sorting
-        switch (sortBy) {
-            case "price_asc":
-                result.sort((a, b) => a.basePrice - b.basePrice);
-                break;
-            case "price_desc":
-                result.sort((a, b) => b.basePrice - a.basePrice);
-                break;
-            case "newest":
-                // Mock sorting for newest (using ID as proxy)
-                result.sort((a, b) => b.id.localeCompare(a.id));
-                break;
-            case "popular":
-            default:
-                result.sort((a, b) => b.rating - a.rating); // Sort by rating for popularity
-                break;
-        }
+        const sorted = [...result].sort((a, b) => {
+            switch (sortBy) {
+                case "price_asc":
+                    return a.basePrice - b.basePrice;
+                case "price_desc":
+                    return b.basePrice - a.basePrice;
+                case "newest":
+                    return b.id.localeCompare(a.id);
+                case "popular":
+                default:
+                    return b.rating - a.rating;
+            }
+        });
 
-        return result;
-    }, [searchQuery, selectedCategory, selectedOccasion, priceRange, sortBy]);
+        return sorted;
+    }, [searchQuery, selectedCategory, selectedOccasion, priceRange, sortBy, selectedDietary]);
 
     const activeFilterCount = [
         selectedCategory !== "all",
@@ -298,85 +296,71 @@ export default function TemplatesPage() {
             </div>
 
             {/* Product Grid */}
-            <motion.div
-                layout
-                className="p-4 grid grid-cols-2 gap-4"
-            >
-                <AnimatePresence mode="popLayout">
-                    {filteredProducts.length > 0 ? (
-                        filteredProducts.map((product) => {
-                            const vendor = getVendorById(product.vendorId);
-                            return (
-                                <motion.div
-                                    key={product.id}
-                                    layout
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
-                                    transition={{ duration: 0.2 }}
-                                    onClick={() => navigate(`/sablonlar/${product.id}`)}
-                                    className="group relative flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md cursor-pointer"
-                                >
-                                    <div className="aspect-square overflow-hidden bg-secondary">
-                                        <img
-                                            src={product.image}
-                                            alt={product.name}
-                                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                            loading="lazy"
-                                        />
-                                        {product.rating >= 4.5 && (
-                                            <div className="absolute top-2 right-2 bg-background/90 backdrop-blur px-1.5 py-0.5 rounded text-[10px] font-bold shadow-sm flex items-center gap-0.5">
-                                                ★ {product.rating}
-                                            </div>
-                                        )}
-                                        <div className="absolute top-2 left-2 flex flex-col gap-1">
-                                            {product.dietaryLabels?.map(label => (
-                                                <Badge key={label} variant="secondary" className="bg-white/90 backdrop-blur text-[9px] h-4 py-0 px-1.5 shadow-sm border-0">
-                                                    {label}
-                                                </Badge>
-                                            ))}
+            <div className="p-4 grid grid-cols-2 gap-4">
+                {filteredProducts.length > 0 ? (
+                    filteredProducts.map((product) => {
+                        const vendor = getVendorById(product.vendorId);
+                        return (
+                            <div
+                                key={product.id}
+                                onClick={() => navigate(`/tasarimlar/${product.id}`)}
+                                className="group relative flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md cursor-pointer"
+                            >
+                                <div className="aspect-square overflow-hidden bg-secondary">
+                                    <img
+                                        src={product.image}
+                                        alt={product.name}
+                                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                        loading="lazy"
+                                    />
+                                    {product.rating >= 4.5 && (
+                                        <div className="absolute top-2 right-2 bg-background/90 backdrop-blur px-1.5 py-0.5 rounded text-[10px] font-bold shadow-sm flex items-center gap-0.5">
+                                            ★ {product.rating}
+                                        </div>
+                                    )}
+                                    <div className="absolute top-2 left-2 flex flex-col gap-1">
+                                        {product.dietaryLabels?.map(label => (
+                                            <Badge key={label} variant="secondary" className="bg-white/90 backdrop-blur text-[9px] h-4 py-0 px-1.5 shadow-sm border-0">
+                                                {label}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="flex flex-1 flex-col p-3">
+                                    <h3 className="line-clamp-2 text-sm font-semibold leading-tight">
+                                        {product.name}
+                                    </h3>
+                                    <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                                        <div className="h-4 w-4 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                            <Sparkles className="h-2 w-2 text-primary" />
+                                        </div>
+                                        <span className="line-clamp-1">{vendor?.name}</span>
+                                    </div>
+                                    <div className="mt-auto pt-3 flex items-center justify-between">
+                                        <span className="text-sm font-bold text-primary">
+                                            {formatPrice(product.basePrice)}
+                                        </span>
+                                        <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center translate-x-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                                            <ArrowLeft className="h-3 w-3 rotate-180" />
                                         </div>
                                     </div>
-                                    <div className="flex flex-1 flex-col p-3">
-                                        <h3 className="line-clamp-2 text-sm font-semibold leading-tight">
-                                            {product.name}
-                                        </h3>
-                                        <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-                                            <div className="h-4 w-4 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                                <Sparkles className="h-2 w-2 text-primary" />
-                                            </div>
-                                            <span className="line-clamp-1">{vendor?.name}</span>
-                                        </div>
-                                        <div className="mt-auto pt-3 flex items-center justify-between">
-                                            <span className="text-sm font-bold text-primary">
-                                                {formatPrice(product.basePrice)}
-                                            </span>
-                                            <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center translate-x-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
-                                                <ArrowLeft className="h-3 w-3 rotate-180" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            );
-                        })
-                    ) : (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="col-span-2 flex flex-col items-center justify-center py-20 text-center"
-                        >
-                            <Search className="h-10 w-10 text-muted-foreground opacity-20 mb-4" />
-                            <h3 className="text-lg font-semibold">Sonuç Bulunamadı</h3>
-                            <p className="text-sm text-muted-foreground mt-1">
-                                Arama kriterlerinizi değiştirerek tekrar deneyin.
-                            </p>
-                            <Button variant="link" onClick={clearFilters} className="mt-2 text-primary">
-                                Filtreleri Temizle
-                            </Button>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </motion.div>
+                                </div>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <div className="col-span-2 flex flex-col items-center justify-center py-20 text-center">
+                        <Search className="h-10 w-10 text-muted-foreground opacity-20 mb-4" />
+                        <h3 className="text-lg font-semibold">Sonuç Bulunamadı</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Arama kriterlerinizi değiştirerek tekrar deneyin.
+                        </p>
+                        <Button variant="link" onClick={clearFilters} className="mt-2 text-primary">
+                            Filtreleri Temizle
+                        </Button>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

@@ -75,7 +75,7 @@ export default function VendorStorePage() {
                             <TabsContent value="all" className="mt-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {products.map(product => (
-                                        <Link key={product.id} to={`/sablonlar/${product.id}`} className="group">
+                                        <Link key={product.id} to={`/tasarimlar/${product.id}`} className="group">
                                             <Card className="rounded-[2rem] overflow-hidden border-0 shadow-sm hover:shadow-xl transition-all h-full bg-white">
                                                 <div className="aspect-[4/5] relative overflow-hidden">
                                                     <img src={product.image} className="w-full h-full object-cover transition-transform group-hover:scale-110" alt={product.name} />

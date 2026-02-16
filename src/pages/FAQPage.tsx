@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 const faqs = [
     {
         question: "Sipariş süreci nasıl işler?",
-        answer: "Beğendiğiniz bir pasta şablonunu seçip kişiselleştirebilir veya 'Tasarla' bölümünden kendi hayalinizdeki pastayı tarif ederek satıcılardan teklif alabilirsiniz. Teklifi onayladıktan sonra ödemenizi yaparak siparişinizi kesinleştirirsiniz."
+        answer: "Beğendiğiniz bir pasta tasarımını seçip kişiselleştirebilir veya 'Tasarla' bölümünden kendi hayalinizdeki pastayı tarif ederek satıcılardan teklif alabilirsiniz. Teklifi onayladıktan sonra ödemenizi yaparak siparişinizi kesinleştirirsiniz."
     },
     {
         question: "Özel tasarım pasta için görsel yükleyebilir miyim?",

@@ -12,11 +12,7 @@ export default function CustomerLayout() {
         <div className="min-h-screen bg-background flex flex-col">
             <Header />
             <main className="flex-1 pb-20 max-w-5xl mx-auto w-full overflow-x-hidden">
-                <AnimatePresence mode="wait">
-                    <PageTransition key={location.pathname}>
-                        <Outlet />
-                    </PageTransition>
-                </AnimatePresence>
+                <Outlet />
             </main>
             <Footer />
             <BottomNav />

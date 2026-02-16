@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Trash2, Plus, Minus, Tag, TicketPercent } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { Input } from "@/components/ui/input";
@@ -32,9 +32,9 @@ const CartPage = () => {
                 </div>
                 <h2 className="font-display text-xl font-bold">Sepetiniz boş</h2>
                 <p className="mt-2 text-sm text-muted-foreground max-w-[200px]">
-                    Hazır şablonlardan beğendiğiniz pastaları sepete ekleyin.
+                    Hazır tasarımlardan beğendiğiniz pastaları sepete ekleyin.
                 </p>
-                <Button className="mt-6" onClick={() => navigate("/sablonlar")}>
+                <Button className="mt-6" onClick={() => navigate("/tasarimlar")}>
                     Pastaları Keşfet
                 </Button>
             </div>
@@ -187,7 +187,7 @@ const CartPage = () => {
                 <Button
                     variant="outline"
                     className="w-full rounded-2xl border-dashed border-slate-300 h-12 text-muted-foreground hover:text-primary hover:border-primary/50"
-                    onClick={() => navigate("/sablonlar")}
+                    onClick={() => navigate("/tasarimlar")}
                 >
                     <Plus className="h-4 w-4 mr-2" />
                     Başka Ürünler Ekle
