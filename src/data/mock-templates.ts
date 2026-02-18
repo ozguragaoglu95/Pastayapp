@@ -3,7 +3,7 @@ import { TemplateProduct } from '@/types';
 export const mockTemplates: TemplateProduct[] = [
     {
         id: 't1',
-        vendorId: 'v1',
+        vendorId: 'u-vendor1',
         name: 'Orman Meyveli Rüya',
         description: 'Taze orman meyveleri ve hafif krema ile hazırlanan, vanilya pandispanyalı özel tasarım pasta.',
         basePrice: 1200,
@@ -45,7 +45,7 @@ export const mockTemplates: TemplateProduct[] = [
     },
     {
         id: 't2',
-        vendorId: 'v1',
+        vendorId: 'u-vendor1',
         name: 'Minimalist Nişan Pastası',
         description: 'Zarif detaylar ve altın dokunuşlarla hazırlanan iki katlı nişan pastası.',
         basePrice: 2500,
@@ -127,7 +127,7 @@ export const mockTemplates: TemplateProduct[] = [
     },
     {
         id: 't5',
-        vendorId: 'v1',
+        vendorId: 'u-vendor1',
         name: 'Mavi Bulut Baby Shower',
         description: 'Bebek cinsiyet partileri ve baby shower kutlamaları için yumuşak tonlarda tasarım pasta.',
         basePrice: 1800,
@@ -140,6 +140,38 @@ export const mockTemplates: TemplateProduct[] = [
         rating: 4.7,
         reviewCount: 25,
         dietaryLabels: ["Vegan", "Şekersiz"],
+        optionGroups: []
+    },
+    {
+        id: 't6',
+        vendorId: 'u-vendor1',
+        name: 'Kırmızı Güllü Nişan Pastası',
+        description: 'Klasik ve şık tasarım, canlı çiçeklerle süslenmiş.',
+        basePrice: 3200,
+        image: 'https://images.unsplash.com/photo-1535254023120-35863347cc0c?w=800',
+        gallery: [],
+        category: 'Nişan',
+        occasion: 'Nişan',
+        prepTimeDays: 7,
+        portionCount: 25,
+        rating: 4.9,
+        reviewCount: 15,
+        optionGroups: []
+    },
+    {
+        id: 't7',
+        vendorId: 'u-vendor1',
+        name: 'Gökkuşağı Sürprizi',
+        description: 'İçinden renkler fışkıran eğlenceli bir doğum günü pastası.',
+        basePrice: 950,
+        image: 'https://images.unsplash.com/photo-1558636508-e0db3814bd1d?w=800',
+        gallery: [],
+        category: 'Doğum Günü',
+        occasion: 'Doğum Günü',
+        prepTimeDays: 2,
+        portionCount: 8,
+        rating: 4.6,
+        reviewCount: 38,
         optionGroups: []
     }
 ];

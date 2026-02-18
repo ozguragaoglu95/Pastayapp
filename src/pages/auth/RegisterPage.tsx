@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { UserRole } from "@/types";
 import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
+import { MapPin } from "lucide-react";
 
 export default function RegisterPage() {
     const { register } = useAuth();
@@ -23,35 +24,55 @@ export default function RegisterPage() {
 
     // Customer Form State
     const [customerName, setCustomerName] = useState("");
-    const [customerEmail, setCustomerEmail] = useState("");
-    const [customerPassword, setCustomerPassword] = useState("");
     const [customerPhone, setCustomerPhone] = useState("");
+    const [customerPassword, setCustomerPassword] = useState("");
+    const [customerAddress, setCustomerAddress] = useState("");
 
     // Vendor Form State
-    const [vendorBusinessName, setVendorBusinessName] = useState(""); // Maps to name
-    const [vendorContactPerson, setVendorContactPerson] = useState(""); // Kept for reference but user name will be business name or contact person? Let's use Business Name as User Name for simplicity or concat
+    const [vendorBusinessName, setVendorBusinessName] = useState("");
+    const [vendorContactPerson, setVendorContactPerson] = useState("");
     const [vendorEmail, setVendorEmail] = useState("");
     const [vendorPassword, setVendorPassword] = useState("");
     const [vendorPhone, setVendorPhone] = useState("");
     const [vendorTaxId, setVendorTaxId] = useState("");
     const [vendorAddress, setVendorAddress] = useState("");
 
+    const handleGetLocation = (setter: (val: string) => void) => {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                // In a real app, we'd reverse geocode here. For mock, we'll just show coordinates
+                const { latitude, longitude } = position.coords;
+                setter(`Konum: ${latitude.toFixed(4)}, ${longitude.toFixed(4)} (Otomatik Alındı)`);
+                toast({
+                    title: "Konum Alındı",
+                    description: "Mevcut konumunuz adres alanına eklendi.",
+                });
+            }, (error) => {
+                toast({
+                    title: "Konum Alınamadı",
+                    description: "Lütfen konum izinlerinizi kontrol edin.",
+                    variant: "destructive"
+                });
+            });
+        }
+    };
+
     const handleRegister = async (role: UserRole) => {
         setIsLoading(true);
         setTimeout(() => {
             if (role === 'customer') {
                 register({
-                    email: customerEmail,
+                    phone: customerPhone,
                     name: customerName,
                     role: 'customer',
-                    phone: customerPhone
+                    address: customerAddress
                 });
             } else {
                 register({
-                    email: vendorEmail,
-                    name: vendorBusinessName, // Using business name as display name
-                    role: 'vendor',
                     phone: vendorPhone,
+                    email: vendorEmail,
+                    name: vendorBusinessName,
+                    role: 'vendor',
                     taxId: vendorTaxId,
                     address: vendorAddress
                 });
@@ -95,12 +116,23 @@ export default function RegisterPage() {
                                 <Input id="c-name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Adınız Soyadınız" />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="c-email">E-posta</Label>
-                                <Input id="c-email" type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} placeholder="ornek@email.com" />
-                            </div>
-                            <div className="space-y-2">
                                 <Label htmlFor="c-phone">Telefon Numarası</Label>
                                 <Input id="c-phone" type="tel" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} placeholder="0555 555 55 55" />
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="c-address">Adres</Label>
+                                    <Button
+                                        type="button"
+                                        variant="link"
+                                        size="sm"
+                                        className="h-auto p-0 flex items-center gap-1 text-xs"
+                                        onClick={() => handleGetLocation(setCustomerAddress)}
+                                    >
+                                        <MapPin className="h-3 w-3" /> Konum Al
+                                    </Button>
+                                </div>
+                                <Input id="c-address" value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} placeholder="Mahalle, No, İlçe..." />
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="c-password">Şifre</Label>
@@ -136,7 +168,18 @@ export default function RegisterPage() {
                                 <Input id="v-tax" value={vendorTaxId} onChange={(e) => setVendorTaxId(e.target.value)} placeholder="Vergi No" />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="v-address">Tam Açık Adres</Label>
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="v-address">Tam Açık Adres</Label>
+                                    <Button
+                                        type="button"
+                                        variant="link"
+                                        size="sm"
+                                        className="h-auto p-0 flex items-center gap-1 text-xs"
+                                        onClick={() => handleGetLocation(setVendorAddress)}
+                                    >
+                                        <MapPin className="h-3 w-3" /> Konum Al
+                                    </Button>
+                                </div>
                                 <Input id="v-address" value={vendorAddress} onChange={(e) => setVendorAddress(e.target.value)} placeholder="Mahalle, Cadde, Sokak, No, İlçe/İl" />
                             </div>
                             <div className="space-y-2">

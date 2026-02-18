@@ -45,6 +45,7 @@ import VendorOrdersPage from "@/pages/vendor/VendorOrdersPage";
 import VendorFinancePage from "@/pages/vendor/VendorFinancePage";
 import VendorProductsPage from "@/pages/vendor/VendorProductsPage";
 import VendorAddProductPage from "@/pages/vendor/VendorAddProductPage";
+import VendorRequestsPage from "@/pages/vendor/VendorRequestsPage";
 import VendorSettingsPage from "@/pages/vendor/VendorSettingsPage";
 
 // Admin pages
@@ -118,6 +119,7 @@ const App = () => (
                                             <Route index element={<Navigate to="/pastane/panel" replace />} />
                                             <Route path="panel" element={<VendorDashboardPage />} />
                                             <Route path="talep/:id" element={<VendorRequestDetailPage />} />
+                                            <Route path="talepler" element={<VendorRequestsPage />} />
                                             <Route path="siparisler" element={<VendorOrdersPage />} />
                                             <Route path="finans" element={<VendorFinancePage />} />
                                             <Route path="urunler" element={<VendorProductsPage />} />

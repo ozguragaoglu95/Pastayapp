@@ -173,7 +173,7 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="email">E-posta</Label>
+                                    <Label htmlFor="email">E-posta {personalInfo.email ? "" : "(Opsiyonel)"}</Label>
                                     <div className="relative">
                                         <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                                         <Input
@@ -182,8 +182,10 @@ export default function ProfilePage() {
                                             className="pl-9"
                                             value={personalInfo.email}
                                             onChange={e => setPersonalInfo({ ...personalInfo, email: e.target.value })}
+                                            placeholder="E-posta adresinizi ekleyin"
                                         />
                                     </div>
+                                    {!personalInfo.email && <p className="text-[10px] text-muted-foreground italic">E-posta ekleyerek kampanya ve bildirimlerden haberdar olabilirsiniz.</p>}
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="phone">Telefon Numarası</Label>
@@ -274,7 +276,25 @@ export default function ProfilePage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="address">İşletme Adresi</Label>
+                                        <div className="flex items-center justify-between">
+                                            <Label htmlFor="address">İşletme Adresi</Label>
+                                            <Button
+                                                type="button"
+                                                variant="link"
+                                                size="sm"
+                                                className="h-auto p-0 flex items-center gap-1 text-[10px]"
+                                                onClick={() => {
+                                                    if ("geolocation" in navigator) {
+                                                        navigator.geolocation.getCurrentPosition(pos => {
+                                                            setVendorData({ ...vendorData, address: `Konum: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}` });
+                                                            toast({ title: "Konum Güncellendi" });
+                                                        });
+                                                    }
+                                                }}
+                                            >
+                                                <MapPin className="h-3 w-3" /> Konum Al
+                                            </Button>
+                                        </div>
                                         <Textarea
                                             id="address"
                                             value={vendorData.address}

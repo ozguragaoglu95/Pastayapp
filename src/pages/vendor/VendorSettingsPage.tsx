@@ -1,16 +1,45 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
-import { Camera, ShieldCheck, MapPin, Phone, User, Lock, LogOut } from "lucide-react";
+import { Camera, ShieldCheck, MapPin, Phone, User, Lock, LogOut, ArrowLeft, Clock, Truck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 export default function VendorSettingsPage() {
+    const navigate = useNavigate();
     const { user, logout } = useAuth();
     const [loading, setLoading] = useState(false);
+    const [offersDelivery, setOffersDelivery] = useState(true);
+    const [businessHours, setBusinessHours] = useState({
+        monday: { open: "09:00", close: "18:00", closed: false },
+        tuesday: { open: "09:00", close: "18:00", closed: false },
+        wednesday: { open: "09:00", close: "18:00", closed: false },
+        thursday: { open: "09:00", close: "18:00", closed: false },
+        friday: { open: "09:00", close: "18:00", closed: false },
+        saturday: { open: "10:00", close: "16:00", closed: false },
+        sunday: { open: "10:00", close: "16:00", closed: true },
+    });
+
+    const dayNames = {
+        monday: "Pazartesi",
+        tuesday: "Salı",
+        wednesday: "Çarşamba",
+        thursday: "Perşembe",
+        friday: "Cuma",
+        saturday: "Cumartesi",
+        sunday: "Pazar"
+    };
+
+    const timeOptions = Array.from({ length: 24 }, (_, i) => {
+        const hour = i.toString().padStart(2, '0');
+        return [`${hour}:00`, `${hour}:30`];
+    }).flat();
 
     const handleSave = (e: React.FormEvent) => {
         e.preventDefault();
@@ -26,9 +55,14 @@ export default function VendorSettingsPage() {
 
     return (
         <div className="p-6 max-w-4xl mx-auto space-y-8 pb-32">
-            <div>
-                <h1 className="text-3xl font-black font-display text-slate-900">Ayarlar</h1>
-                <p className="text-slate-500 font-medium">Mağaza profilinizi ve güvenlik tercihlerinizi yönetin.</p>
+            <div className="flex items-center gap-3">
+                <Button variant="ghost" size="icon" onClick={() => navigate("/pastane/panel")} className="rounded-full">
+                    <ArrowLeft className="h-6 w-6" />
+                </Button>
+                <div>
+                    <h1 className="text-3xl font-black font-display text-slate-900">Ayarlar</h1>
+                    <p className="text-slate-500 font-medium">Mağaza profilinizi ve güvenlik tercihlerinizi yönetin.</p>
+                </div>
             </div>
 
             <div className="grid gap-8 md:grid-cols-3">
@@ -128,6 +162,100 @@ export default function VendorSettingsPage() {
                                     <Label className="font-bold text-slate-700">Şifre Tekrar</Label>
                                     <Input type="password" placeholder="••••••••" className="rounded-xl border-2 h-11" />
                                 </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="rounded-[2.5rem] border-2 border-slate-100 shadow-sm overflow-hidden">
+                        <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+                            <CardTitle className="text-lg font-black flex items-center gap-2">
+                                <Clock className="h-5 w-5 text-primary" /> Çalışma Saatleri
+                            </CardTitle>
+                            <CardDescription className="font-medium">Mağazanızın aktif olduğu gün ve saatleri belirleyin.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-8 space-y-4">
+                            {Object.entries(businessHours).map(([day, hours]) => (
+                                <div key={day} className="flex items-center gap-4 p-3 rounded-xl border-2 border-slate-100 hover:border-primary/20 transition-colors">
+                                    <div className="flex items-center gap-3 flex-1">
+                                        <Switch
+                                            checked={!hours.closed}
+                                            onCheckedChange={(checked) => {
+                                                setBusinessHours(prev => ({
+                                                    ...prev,
+                                                    [day]: { ...prev[day as keyof typeof prev], closed: !checked }
+                                                }));
+                                            }}
+                                        />
+                                        <Label className="font-bold text-slate-700 min-w-[100px]">
+                                            {dayNames[day as keyof typeof dayNames]}
+                                        </Label>
+                                    </div>
+                                    {!hours.closed && (
+                                        <div className="flex items-center gap-2">
+                                            <Select
+                                                value={hours.open}
+                                                onValueChange={(value) => {
+                                                    setBusinessHours(prev => ({
+                                                        ...prev,
+                                                        [day]: { ...prev[day as keyof typeof prev], open: value }
+                                                    }));
+                                                }}
+                                            >
+                                                <SelectTrigger className="w-[100px] h-9">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {timeOptions.map(time => (
+                                                        <SelectItem key={time} value={time}>{time}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <span className="text-slate-400 font-bold">-</span>
+                                            <Select
+                                                value={hours.close}
+                                                onValueChange={(value) => {
+                                                    setBusinessHours(prev => ({
+                                                        ...prev,
+                                                        [day]: { ...prev[day as keyof typeof prev], close: value }
+                                                    }));
+                                                }}
+                                            >
+                                                <SelectTrigger className="w-[100px] h-9">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {timeOptions.map(time => (
+                                                        <SelectItem key={time} value={time}>{time}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    )}
+                                    {hours.closed && (
+                                        <span className="text-sm text-slate-400 italic">Kapalı</span>
+                                    )}
+                                </div>
+                            ))}
+                        </CardContent>
+                    </Card>
+
+                    <Card className="rounded-[2.5rem] border-2 border-slate-100 shadow-sm overflow-hidden">
+                        <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+                            <CardTitle className="text-lg font-black flex items-center gap-2">
+                                <Truck className="h-5 w-5 text-primary" /> Teslimat Seçenekleri
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-8">
+                            <div className="flex items-center justify-between p-4 rounded-xl border-2 border-slate-100">
+                                <div>
+                                    <Label className="font-bold text-slate-900 text-base">Teslimat Yapıyor Musunuz?</Label>
+                                    <p className="text-sm text-slate-500 mt-1">Müşterilere eve teslimat hizmeti sunuyorsanız aktif edin.</p>
+                                </div>
+                                <Switch
+                                    checked={offersDelivery}
+                                    onCheckedChange={setOffersDelivery}
+                                    className="ml-4"
+                                />
                             </div>
                         </CardContent>
                     </Card>

@@ -1,18 +1,24 @@
 import { mockTemplates } from "@/data/mock-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Plus, ArrowLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function VendorProductsPage() {
+    const navigate = useNavigate();
     // Mock filter for this specific vendor (v1)
     const vendorProducts = mockTemplates.filter(t => t.vendorId === 'v1');
 
     return (
         <div className="p-6 space-y-6 max-w-6xl mx-auto">
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold font-display">Tüm Ürünlerim</h1>
-                <Button asChild>
+            <div className="flex justify-between items-center bg-white p-4 rounded-3xl border-2 border-slate-100 shadow-sm">
+                <div className="flex items-center gap-3">
+                    <Button variant="ghost" size="icon" onClick={() => navigate("/pastane/panel")} className="rounded-full">
+                        <ArrowLeft className="h-6 w-6" />
+                    </Button>
+                    <h1 className="text-3xl font-black font-display text-slate-900">Tüm Ürünlerim</h1>
+                </div>
+                <Button asChild className="rounded-2xl h-11 px-6 shadow-lg shadow-primary/20">
                     <Link to="/pastane/urun-ekle">
                         <Plus className="mr-2 h-4 w-4" /> Yeni Ürün
                     </Link>

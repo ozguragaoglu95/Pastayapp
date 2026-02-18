@@ -19,7 +19,7 @@ export default function LoginPage() {
     // Get return url from location state or default to home/dashboard
     const from = location.state?.from?.pathname || "/";
 
-    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
@@ -27,7 +27,7 @@ export default function LoginPage() {
         setIsLoading(true);
         // Simulate API call
         setTimeout(() => {
-            login(email || `${role}@example.com`, role);
+            login(phone || "5551234567", role);
             setIsLoading(false);
 
             toast({
@@ -51,7 +51,7 @@ export default function LoginPage() {
                 <CardHeader className="text-center">
                     <CardTitle className="text-2xl font-display">Giriş Yap</CardTitle>
                     <CardDescription>
-                        Devam etmek için lütfen giriş yapın
+                        Devam etmek için lütfen telefon numaranızla giriş yapın
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -63,13 +63,13 @@ export default function LoginPage() {
 
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="email">E-posta</Label>
+                                <Label htmlFor="phone">Telefon Numarası</Label>
                                 <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="ornek@email.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    id="phone"
+                                    type="tel"
+                                    placeholder="0555 555 55 55"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
                                 />
                             </div>
                             <div className="space-y-2">

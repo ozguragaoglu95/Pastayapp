@@ -14,7 +14,7 @@ export default function AdminLoginPage() {
     const { toast } = useToast();
 
     // Default admin credentials for demo
-    const [email, setEmail] = useState("admin@cakecraft.tr");
+    const [phone, setPhone] = useState("5550000000");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
@@ -22,8 +22,8 @@ export default function AdminLoginPage() {
         e.preventDefault();
         setIsLoading(true);
         setTimeout(() => {
-            if (email === "admin@cakecraft.tr") {
-                login(email, 'admin');
+            if (phone === "5550000000") {
+                login(phone, 'admin');
                 toast({
                     title: "Admin Girişi Başarılı",
                     description: "Yönetim paneline yönlendiriliyorsunuz.",
@@ -57,12 +57,12 @@ export default function AdminLoginPage() {
                 <form onSubmit={handleLogin}>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="email">Kullanıcı Adı</Label>
+                            <Label htmlFor="phone">Telefon Numarası</Label>
                             <Input
-                                id="email"
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                id="phone"
+                                type="tel"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
                             />
                         </div>
                         <div className="space-y-2">

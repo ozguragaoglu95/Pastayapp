@@ -3,15 +3,15 @@ export type UserRole = 'customer' | 'vendor' | 'admin';
 
 export interface User {
     id: string;
-    email: string;
+    email?: string;
     name: string;
     role: UserRole;
     avatar?: string;
-    phone?: string;
+    phone: string;
     username?: string;
     bio?: string;
     taxId?: string; // For vendors
-    address?: string; // For vendors
+    address?: string; // For all users
 }
 
 // ---- Vendor ----
@@ -158,7 +158,7 @@ export interface ChatThread {
 }
 
 // ---- Orders ----
-export type OrderStatus = 'confirmed' | 'in_progress' | 'ready' | 'delivered' | 'cancelled';
+export type OrderStatus = 'confirmed' | 'preparing' | 'in_progress' | 'ready' | 'shipped' | 'delivered' | 'completed' | 'returned' | 'cancelled';
 
 export interface OrderStatusHistory {
     status: OrderStatus;

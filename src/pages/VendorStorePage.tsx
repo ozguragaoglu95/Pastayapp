@@ -1,6 +1,7 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { mockVendors, mockTemplates } from "@/data/mock-data";
-import { Star, MapPin, Clock, ShoppingBag, ChevronRight, Info } from "lucide-react";
+import { Star, MapPin, Clock, ShoppingBag, ChevronRight, Info, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +10,8 @@ import NotFound from "./NotFound";
 
 export default function VendorStorePage() {
     const { id } = useParams();
+    const navigate = useNavigate();
+    const { user } = useAuth();
     const vendor = mockVendors.find(v => v.id === id);
     const products = mockTemplates.filter(t => t.vendorId === id);
 
@@ -24,6 +27,19 @@ export default function VendorStorePage() {
                     alt="Banner"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent" />
+
+                {/* Conditional Back Button for Vendor */}
+                {user?.role === 'vendor' && (
+                    <div className="absolute top-6 left-6 z-50">
+                        <Button
+                            onClick={() => navigate("/pastane/panel")}
+                            className="rounded-full bg-white/20 backdrop-blur-md hover:bg-white/40 border-0 text-white font-black flex items-center gap-2 pr-6"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                            Panele Dön
+                        </Button>
+                    </div>
+                )}
             </div>
 
             <div className="container mx-auto px-4 -mt-16 relative z-10">
