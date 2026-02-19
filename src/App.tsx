@@ -29,6 +29,7 @@ import CheckoutPage from "@/pages/CheckoutPage";
 import DesignWizardPage from "@/pages/DesignWizardPage";
 import RequestsPage from "@/pages/RequestsPage";
 import RequestDetailPage from "@/pages/RequestDetailPage";
+import OfferDetailPage from "@/pages/OfferDetailPage";
 import OrderTrackingPage from "@/pages/OrderTrackingPage";
 import ProfilePage from "@/pages/ProfilePage";
 import AboutPage from "@/pages/AboutPage";
@@ -47,6 +48,7 @@ import VendorProductsPage from "@/pages/vendor/VendorProductsPage";
 import VendorAddProductPage from "@/pages/vendor/VendorAddProductPage";
 import VendorRequestsPage from "@/pages/vendor/VendorRequestsPage";
 import VendorSettingsPage from "@/pages/vendor/VendorSettingsPage";
+import VendorOrderDetailPage from "@/pages/vendor/VendorOrderDetailPage";
 
 // Admin pages
 import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
@@ -94,8 +96,13 @@ const App = () => (
                                                     <RequestDetailPage />
                                                 </ProtectedRoute>
                                             } />
+                                            <Route path="/taleplerim/:requestId/teklif/:offerId" element={
+                                                <ProtectedRoute allowedRoles={['customer']}>
+                                                    <OfferDetailPage />
+                                                </ProtectedRoute>
+                                            } />
                                             <Route path="/siparis/:id" element={
-                                                <ProtectedRoute allowedRoles={['customer', 'vendor', 'admin']}>
+                                                <ProtectedRoute allowedRoles={['customer', 'admin']}>
                                                     <OrderTrackingPage />
                                                 </ProtectedRoute>
                                             } />
@@ -121,6 +128,7 @@ const App = () => (
                                             <Route path="talep/:id" element={<VendorRequestDetailPage />} />
                                             <Route path="talepler" element={<VendorRequestsPage />} />
                                             <Route path="siparisler" element={<VendorOrdersPage />} />
+                                            <Route path="siparis/:id" element={<VendorOrderDetailPage />} />
                                             <Route path="finans" element={<VendorFinancePage />} />
                                             <Route path="urunler" element={<VendorProductsPage />} />
                                             <Route path="urun-ekle" element={<VendorAddProductPage />} />

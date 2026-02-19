@@ -40,6 +40,7 @@ export default function VendorDashboardPage() {
     const { requests } = useRequests();
     const { orders, updateOrderStatus } = useOrders();
     const [activeTab, setActiveTab] = useState<DashboardTab>('marketplace');
+    const [filterStatus, setFilterStatus] = useState<string | null>(null);
 
     const vendorId = user?.id || 'u-vendor1';
 
@@ -66,7 +67,18 @@ export default function VendorDashboardPage() {
     );
 
     // Active Orders for slider (always on): Confirmed, Preparing, Completed (Shipped is removed per user request)
-    const sliderOrders = orders.filter(o => o.vendorId === vendorId && ['confirmed', 'preparing', 'completed'].includes(o.status));
+    // Also apply the clickable filter if selected (If user clicks 'shipped', show only shipped)
+    const sliderOrders = orders.filter(o => {
+        const isVendorOrder = o.vendorId === vendorId;
+        if (!isVendorOrder) return false;
+
+        if (filterStatus) {
+            return o.status === filterStatus;
+        }
+
+        // Default view: exclude 'shipped', 'delivered', 'cancelled'
+        return ['confirmed', 'preparing', 'completed'].includes(o.status);
+    });
 
     // Status breakdown for the widget header
     const statusStats = {
@@ -341,23 +353,41 @@ export default function VendorDashboardPage() {
                         </div>
                         <h2 className="text-xl font-black text-slate-900">Aktif Siparişler</h2>
                         <div className="flex items-center gap-1.5 flex-wrap">
+                            <Badge
+                                className={`border-0 rounded-lg transition-colors cursor-pointer ${!filterStatus ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                                onClick={() => setFilterStatus(null)}
+                            >
+                                ✨ Tümü
+                            </Badge>
                             {statusStats.confirmed > 0 && (
-                                <Badge className="bg-blue-50 text-blue-600 border-0 rounded-lg hover:bg-blue-100 transition-colors cursor-default">
+                                <Badge
+                                    className={`border-0 rounded-lg transition-colors cursor-pointer ${filterStatus === 'confirmed' ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                                    onClick={() => setFilterStatus(filterStatus === 'confirmed' ? null : 'confirmed')}
+                                >
                                     📥 {statusStats.confirmed}
                                 </Badge>
                             )}
                             {statusStats.preparing > 0 && (
-                                <Badge className="bg-orange-50 text-orange-600 border-0 rounded-lg hover:bg-orange-100 transition-colors cursor-default">
+                                <Badge
+                                    className={`border-0 rounded-lg transition-colors cursor-pointer ${filterStatus === 'preparing' ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-600 hover:bg-orange-100'}`}
+                                    onClick={() => setFilterStatus(filterStatus === 'preparing' ? null : 'preparing')}
+                                >
                                     🥣 {statusStats.preparing}
                                 </Badge>
                             )}
                             {statusStats.completed > 0 && (
-                                <Badge className="bg-cyan-50 text-cyan-600 border-0 rounded-lg hover:bg-cyan-100 transition-colors cursor-default">
+                                <Badge
+                                    className={`border-0 rounded-lg transition-colors cursor-pointer ${filterStatus === 'completed' ? 'bg-cyan-500 text-white' : 'bg-cyan-50 text-cyan-600 hover:bg-cyan-100'}`}
+                                    onClick={() => setFilterStatus(filterStatus === 'completed' ? null : 'completed')}
+                                >
                                     ✅ {statusStats.completed}
                                 </Badge>
                             )}
                             {statusStats.shipped > 0 && (
-                                <Badge className="bg-purple-50 text-purple-600 border-0 rounded-lg hover:bg-purple-100 transition-colors cursor-default">
+                                <Badge
+                                    className={`border-0 rounded-lg transition-colors cursor-pointer ${filterStatus === 'shipped' ? 'bg-purple-500 text-white' : 'bg-purple-50 text-purple-600 hover:bg-purple-100'}`}
+                                    onClick={() => setFilterStatus(filterStatus === 'shipped' ? null : 'shipped')}
+                                >
                                     🚚 {statusStats.shipped}
                                 </Badge>
                             )}
@@ -385,8 +415,13 @@ export default function VendorDashboardPage() {
                                                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">#{order.id.slice(-4)}</p>
                                                 <h3 className="font-bold text-slate-900">Müşteri Siparişi</h3>
                                             </div>
-                                            <Badge className={`rounded-lg border-0 ${order.status === 'preparing' ? 'bg-orange-500 text-white' : 'bg-blue-500 text-white'}`}>
-                                                {order.status === 'preparing' ? 'Hazırlanıyor' : 'Kabul Edildi'}
+                                            <Badge className={`rounded-lg border-0 ${order.status === 'preparing' ? 'bg-orange-500 text-white' :
+                                                    order.status === 'completed' ? 'bg-cyan-500 text-white' :
+                                                        'bg-blue-500 text-white'
+                                                }`}>
+                                                {order.status === 'preparing' ? 'Hazırlanıyor' :
+                                                    order.status === 'completed' ? 'Tamamlandı' :
+                                                        'Kabul Edildi'}
                                             </Badge>
                                         </div>
 
@@ -399,44 +434,11 @@ export default function VendorDashboardPage() {
 
                                         <div className="flex gap-2">
                                             <Button
-                                                size="sm"
-                                                className="flex-1 rounded-xl font-bold bg-white text-slate-900 border-2 border-slate-100 hover:bg-slate-50"
-                                                onClick={() => navigate(`/siparis/${order.id}`)}
+                                                className="w-full rounded-xl font-black bg-slate-900 hover:bg-slate-800 text-white shadow-xl shadow-slate-200 h-10"
+                                                onClick={() => navigate(`/pastane/siparis/${order.id}`)}
                                             >
-                                                Detay
+                                                Detayları Yönet
                                             </Button>
-                                            {order.status === 'confirmed' && (
-                                                <Button
-                                                    size="sm"
-                                                    className="flex-1 rounded-xl font-bold bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-200"
-                                                    onClick={() => updateOrderStatus(order.id, 'preparing')}
-                                                >
-                                                    Hazırla
-                                                </Button>
-                                            )}
-                                            {order.status === 'preparing' && (
-                                                <Button
-                                                    size="sm"
-                                                    className="flex-1 rounded-xl font-bold bg-cyan-500 hover:bg-cyan-600 text-white shadow-lg shadow-cyan-200"
-                                                    onClick={() => updateOrderStatus(order.id, 'completed')}
-                                                >
-                                                    Tamamla
-                                                </Button>
-                                            )}
-                                            {order.status === 'completed' && (
-                                                <Button
-                                                    size="sm"
-                                                    className="flex-1 rounded-xl font-bold bg-purple-500 hover:bg-purple-600 text-white shadow-lg shadow-purple-200"
-                                                    onClick={() => updateOrderStatus(order.id, 'shipped')}
-                                                >
-                                                    Yola Çıkar
-                                                </Button>
-                                            )}
-                                            {order.status === 'shipped' && (
-                                                <div className="flex-1 flex items-center justify-center bg-slate-100 rounded-xl">
-                                                    <span className="text-[10px] font-bold text-slate-500">Yolda 🚚</span>
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
                                     {order.hasChangeRequest && (

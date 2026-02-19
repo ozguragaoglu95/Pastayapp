@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { ArrowLeft, Search, Filter, MoreHorizontal, Package, CheckCircle2, Clock, MapPin } from "lucide-react";
+import { ArrowLeft, Search, Package, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,6 @@ const getStatusLabel = (status: string) => {
     switch (status) {
         case 'confirmed': return 'Kabul Edildi';
         case 'preparing': return 'Hazırlanıyor';
-        case 'on_the_way':
         case 'shipped': return 'Yolda';
         case 'delivered': return 'Teslim Edildi';
         case 'completed': return 'Tamamlandı';
@@ -37,10 +36,10 @@ const getStatusLabel = (status: string) => {
 export default function VendorOrdersPage() {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { orders, updateOrderStatus } = useOrders();
+    const { orders } = useOrders();
     const { getRequestById } = useRequests();
 
-    const vendorId = user?.id || 'v1';
+    const vendorId = user?.id || 'u-vendor1';
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
 
@@ -86,14 +85,14 @@ export default function VendorOrdersPage() {
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder="Sipariş no, müşteri adı..."
-                        className="pl-9 h-9"
+                        className="pl-9 h-9 border-none bg-slate-50 focus-visible:ring-primary/20"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="h-9 w-[180px]">
+                        <SelectTrigger className="h-9 w-[180px] bg-slate-50 border-none">
                             <SelectValue placeholder="Durum Filtrele" />
                         </SelectTrigger>
                         <SelectContent>
@@ -133,68 +132,51 @@ export default function VendorOrdersPage() {
                         }
 
                         return (
-                            <div key={order.id} className="flex flex-col md:flex-row md:items-center gap-4 p-4 rounded-xl border bg-card hover:shadow-sm transition-all">
+                            <div
+                                key={order.id}
+                                className="bg-white rounded-[1.5rem] p-5 border-2 border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 transition-all cursor-pointer group"
+                                onClick={() => navigate(`/pastane/siparis/${order.id}`)}
+                            >
                                 <div className="flex flex-1 items-start gap-4">
-                                    <div className="h-16 w-16 rounded-lg bg-secondary overflow-hidden shrink-0">
+                                    <div className="h-16 w-16 rounded-2xl bg-slate-50 overflow-hidden shrink-0 border border-slate-100">
                                         {productImage ? (
                                             <img src={productImage} alt="" className="h-full w-full object-cover" />
                                         ) : (
-                                            <div className="h-full w-full flex items-center justify-center bg-primary/10 text-primary">
-                                                <Package className="h-8 w-8" />
+                                            <div className="h-full w-full flex items-center justify-center bg-primary/5 text-primary">
+                                                <Package className="h-6 w-6 opacity-40" />
                                             </div>
                                         )}
                                     </div>
-                                    <div className="space-y-1">
+                                    <div className="space-y-1.5 flex-1">
                                         <div className="flex items-center gap-2">
-                                            <span className="font-mono text-xs text-muted-foreground">#{order.id}</span>
-                                            <Badge variant="outline" className={`text-[10px] h-5 border-0 rounded-lg ${STATUS_Styles[order.status] || "bg-secondary"}`}>
+                                            <span className="font-bold text-[10px] text-slate-400 uppercase tracking-widest">#{order.id}</span>
+                                            <Badge className={`text-[10px] h-5 border-0 rounded-lg ${STATUS_Styles[order.status] || "bg-secondary"}`}>
                                                 {getStatusLabel(order.status)}
                                             </Badge>
                                         </div>
-                                        <h3 className="font-semibold line-clamp-1">{productName}</h3>
-                                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                            <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {new Date(order.createdAt).toLocaleDateString("tr-TR")}</span>
+                                        <h3 className="font-bold text-slate-900 line-clamp-1">{productName}</h3>
+                                        <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400">
+                                            <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {new Date(order.createdAt).toLocaleDateString("tr-TR")}</span>
                                             {order.deliveryAddress && (
-                                                <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {order.deliveryAddress}</span>
+                                                <span className="flex items-center gap-1.5 line-clamp-1"><MapPin className="h-3.5 w-3.5" /> {order.deliveryAddress.split(',')[0]}</span>
                                             )}
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="flex flex-col md:flex-row items-center justify-between md:justify-end gap-3 md:w-auto pt-3 md:pt-0 border-t md:border-0 pl-3">
-                                    <div className="text-right md:mr-4">
-                                        <p className="text-sm font-bold">{formatPrice(order.totalPrice)}</p>
-                                        <p className="text-[10px] text-muted-foreground">Komisyon: {formatPrice(order.commission)}</p>
-                                    </div>
-
-                                    <div className="flex items-center gap-2">
-                                        {/* Status Update Actions */}
-                                        {order.status === 'confirmed' && (
-                                            <Button size="sm" className="h-8 text-[11px] font-bold" onClick={() => updateOrderStatus(order.id, 'preparing')}>Hazırlığa Başla</Button>
-                                        )}
-                                        {order.status === 'preparing' && (
-                                            <Button size="sm" variant="outline" className="h-8 text-[11px] font-bold border-cyan-200 text-cyan-600" onClick={() => updateOrderStatus(order.id, 'completed')}>Tamamla</Button>
-                                        )}
-                                        {order.status === 'completed' && (
-                                            <Button size="sm" variant="outline" className="h-8 text-[11px] font-bold border-purple-200 text-purple-600" onClick={() => updateOrderStatus(order.id, 'shipped')}>Yola Çıkar</Button>
-                                        )}
-                                        {order.status === 'shipped' && (
-                                            <Badge variant="secondary" className="bg-purple-50 text-purple-600 text-[10px]">Teslimat Bekleniyor</Badge>
-                                        )}
-
-                                        <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8">
-                                            <MoreHorizontal className="h-4 w-4" />
-                                        </Button>
-                                    </div>
+                                <div className="flex md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-1 border-t md:border-0 pt-3 md:pt-0">
+                                    <span className="text-sm font-black text-slate-900">{formatPrice(order.totalPrice)}</span>
+                                    <span className="text-[10px] font-black text-primary bg-primary/5 px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                        Detayı Yönet →
+                                    </span>
                                 </div>
                             </div>
                         );
                     })
                 ) : (
-                    <div className="text-center py-12 border-2 border-dashed rounded-xl">
-                        <Package className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
-                        <h3 className="font-semibold text-lg">Sipariş Bulunamadı</h3>
-                        <p className="text-muted-foreground text-sm">Henüz bir sipariş almadınız.</p>
+                    <div className="text-center py-20 bg-white rounded-[2rem] border-2 border-dashed border-slate-100">
+                        <Package className="h-12 w-12 mx-auto text-slate-200 mb-4" />
+                        <h3 className="font-black text-slate-900 text-lg">Sipariş Bulunamadı</h3>
+                        <p className="text-slate-400 text-sm font-medium">Henüz bu kriterlere uygun sipariş bulunmuyor.</p>
                     </div>
                 )}
             </div>

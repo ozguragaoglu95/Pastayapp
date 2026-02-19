@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock, Calendar, Check, X, MessageSquare, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRequests } from "@/contexts/RequestsContext"; // Updated import
+import { useRequests } from "@/contexts/RequestsContext";
+import { getTemplateById } from "@/data/mock-data";
 // import { mockRequests } from "@/data/mock-requests"; // Removed direct mock import
 import { Badge } from "@/components/ui/badge";
 
@@ -62,32 +63,50 @@ export default function RequestsPage() {
                         onClick={() => navigate(`/taleplerim/${req.id}`)}
                         className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm active:scale-[0.98] transition-transform cursor-pointer"
                     >
-                        <div className="flex items-start justify-between">
-                            <div>
-                                <h3 className="font-semibold capitalize">
-                                    {req.spec.occasion.replace("_", " ")} Pastası
-                                </h3>
-                                <p className="text-xs text-muted-foreground mt-0.5">
-                                    {req.spec.shape}, {req.spec.tiers} Katlı, {req.spec.portions} Kişilik
-                                </p>
+                        <div className="flex gap-4">
+                            <div className="h-20 w-20 rounded-xl bg-slate-50 border border-slate-100 overflow-hidden shrink-0">
+                                <img
+                                    src={req.conceptImage || getTemplateById(req.spec.templateId || "")?.image || "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=200"}
+                                    alt="Konsept"
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
-                            <Badge
-                                variant="outline"
-                                className={`${STATUS_MAP[req.status]?.color || "bg-secondary text-foreground"} border-0`}
-                            >
-                                {STATUS_MAP[req.status]?.label || req.status}
-                            </Badge>
-                        </div>
+                            <div className="flex-1 space-y-2">
+                                <div className="flex items-start justify-between">
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            {req.spec.templateId ? (
+                                                <Badge className="bg-blue-50 text-blue-600 border-0 text-[9px] h-4 rounded-md">ŞABLONDAN</Badge>
+                                            ) : (
+                                                <Badge className="bg-purple-50 text-purple-600 border-0 text-[9px] h-4 rounded-md">ÖZEL TASARIM</Badge>
+                                            )}
+                                        </div>
+                                        <h3 className="font-bold text-slate-900 capitalize text-sm">
+                                            {req.spec.occasion.replace("_", " ")} Pastası
+                                        </h3>
+                                        <p className="text-[11px] text-muted-foreground font-medium">
+                                            {req.spec.shape}, {req.spec.tiers} Katlı, {req.spec.portions} Kişilik
+                                        </p>
+                                    </div>
+                                    <Badge
+                                        variant="outline"
+                                        className={`${STATUS_MAP[req.status]?.color || "bg-secondary text-foreground"} border-0 text-[10px] font-bold`}
+                                    >
+                                        {STATUS_MAP[req.status]?.label || req.status}
+                                    </Badge>
+                                </div>
 
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                                <Calendar className="h-3.5 w-3.5" />
-                                {new Date(req.spec.eventDate).toLocaleDateString("tr-TR")}
-                            </span>
-                            <span className="flex items-center gap-1">
-                                <MessageSquare className="h-3.5 w-3.5" />
-                                {req.offers.length} Teklif
-                            </span>
+                                <div className="flex items-center gap-4 text-[10px] font-semibold text-slate-400">
+                                    <span className="flex items-center gap-1">
+                                        <Calendar className="h-3 w-3" />
+                                        {new Date(req.spec.eventDate).toLocaleDateString("tr-TR")}
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <MessageSquare className="h-3 w-3" />
+                                        {req.offers.length} Teklif
+                                    </span>
+                                </div>
+                            </div>
                         </div>
 
                         {(req.status === 'offers_received' || req.status === 'offer_selected') && (

@@ -7,6 +7,7 @@ import { getVendorById, formatPrice } from "@/data/mock-data";
 
 interface OfferCardProps {
     offer: Offer;
+    requestId?: string;
     onAccept?: () => void;
     onClick?: () => void;
     isAccepted?: boolean;
@@ -23,7 +24,10 @@ export default function OfferCard({ offer, onAccept, onClick, isAccepted }: Offe
     }[offer.matchLevel] || 'bg-secondary text-secondary-foreground';
 
     return (
-        <Card className={`overflow-hidden transition-all hover:shadow-md ${isAccepted ? 'ring-2 ring-primary border-primary' : ''}`}>
+        <Card
+            className={`overflow-hidden transition-all hover:shadow-md cursor-pointer ${isAccepted ? 'ring-2 ring-primary border-primary' : ''}`}
+            onClick={onClick}
+        >
             <CardHeader className="p-4 pb-2 flex flex-row items-start justify-between space-y-0">
                 <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-secondary overflow-hidden">

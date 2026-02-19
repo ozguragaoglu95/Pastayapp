@@ -128,7 +128,7 @@ export default function LoginPage() {
                         </div>
                     </div>
 
-                    <Button variant="outline" className="w-full" onClick={() => navigate("/tasarla")}>
+                    <Button variant="outline" className="w-full" onClick={() => navigate("/")}>
                         Üye Olmadan Tasarıma Başla
                     </Button>
 

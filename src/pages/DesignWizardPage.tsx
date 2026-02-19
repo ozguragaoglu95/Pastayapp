@@ -71,8 +71,14 @@ export default function DesignWizardPage() {
     const [userPrompt, setUserPrompt] = useState("");
     const chatEndRef = useRef<HTMLDivElement>(null);
 
-    const [createdRequestId, setCreatedRequestId] = useState<string | null>(localStorage.getItem('pending_request_id'));
-    const [view, setView] = useState<'wizard' | 'summary'>((localStorage.getItem('wizard_view') as any) || 'wizard');
+    const [createdRequestId, setCreatedRequestId] = useState<string | null>(() => {
+        const isReset = new URLSearchParams(window.location.search).get('reset') === 'true';
+        return isReset ? null : localStorage.getItem('pending_request_id');
+    });
+    const [view, setView] = useState<'wizard' | 'summary'>(() => {
+        const isReset = new URLSearchParams(window.location.search).get('reset') === 'true';
+        return isReset ? 'wizard' : (localStorage.getItem('wizard_view') as any) || 'wizard';
+    });
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [editableDesignName, setEditableDesignName] = useState("");
     const [versionMap, setVersionMap] = useState<Record<string, number>>({});
@@ -86,31 +92,44 @@ export default function DesignWizardPage() {
     // Restoration and Persistence
     useEffect(() => {
         const isReset = searchParams.get('reset') === 'true';
-        if (isReset) {
+        const pendingData = localStorage.getItem('pending_design_data');
+
+        // Reset if requested OR if it's a guest with old data (guests always start fresh)
+        if (isReset || (!user && pendingData)) {
             localStorage.removeItem('wizard_view');
             localStorage.removeItem('pending_request_id');
             localStorage.removeItem('pending_design_data');
             localStorage.removeItem('pending_images');
-            setFormData({
-                occasion: "dogum_gunu",
-                portions: searchParams.get('portions') || undefined,
-                recipient: searchParams.get('recipient') || undefined,
-                productTheme: searchParams.get('theme') || undefined,
-                allergyInfo: searchParams.get('allergy') ? decodeURIComponent(searchParams.get('allergy')!) : undefined,
-                vendorId: vendorId || undefined,
-                templateId: templateId || undefined,
-                customOptions: {},
-                productThemeCustom: "",
-                notes: "",
-            });
-            setView('wizard');
-            setCreatedRequestId(null);
-            setCurrentStep(templateId ? 2 : 1);
-            return;
+            localStorage.removeItem('pending_chat');
+            localStorage.removeItem('pending_step');
+            localStorage.removeItem('pending_ai_image');
+            localStorage.removeItem('pending_design_name');
+            localStorage.removeItem('auto_submit');
+
+            if (isReset || (!user && pendingData)) {
+                setFormData({
+                    occasion: "dogum_gunu",
+                    portions: searchParams.get('portions') || undefined,
+                    recipient: searchParams.get('recipient') || undefined,
+                    productTheme: searchParams.get('theme') || undefined,
+                    allergyInfo: searchParams.get('allergy') ? decodeURIComponent(searchParams.get('allergy')!) : undefined,
+                    vendorId: vendorId || undefined,
+                    templateId: templateId || undefined,
+                    customOptions: {},
+                    productThemeCustom: "",
+                    notes: "",
+                });
+                setView('wizard');
+                setCreatedRequestId(null);
+                setCurrentStep(templateId ? 2 : 1);
+                setChatMessages([]);
+                setSelectedAIImage(null);
+                setReferenceImages([]);
+                if (isReset) return;
+            }
         }
 
-        const pendingData = localStorage.getItem('pending_design_data');
-        if (pendingData) {
+        if (pendingData && user) {
             try {
                 const parsed = JSON.parse(pendingData);
                 setFormData(parsed);

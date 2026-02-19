@@ -30,7 +30,7 @@ export default function HomePage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
                         <Button asChild size="lg" className="rounded-full bg-white text-primary hover:bg-slate-50 font-bold px-8 h-14 shadow-xl">
-                            <Link to="/tasarla?reset=true">Hemen Tasarla</Link>
+                            <Link to="/tasarla">Hemen Tasarla</Link>
                         </Button>
                         <Button asChild variant="outline" size="lg" className="rounded-full bg-white/10 border-white/20 text-white hover:bg-white/20 font-bold px-8 h-14 backdrop-blur-sm">
                             <Link to="/tasarimlar">Tasarımları Keşfet</Link>

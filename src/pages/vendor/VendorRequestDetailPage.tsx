@@ -6,10 +6,23 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Calendar, MapPin, Users, Check, AlertCircle, MessageSquare } from 'lucide-react';
+import {
+    ArrowLeft,
+    Calendar,
+    MapPin,
+    Users,
+    Check,
+    AlertCircle,
+    MessageSquare,
+    Sparkles,
+    Wand2,
+    Image as ImageIcon,
+    RefreshCw
+} from 'lucide-react';
 import { useRequests } from '@/contexts/RequestsContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { getTemplateById } from '@/data/mock-data';
 
 export default function VendorRequestDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -24,6 +37,11 @@ export default function VendorRequestDetailPage() {
     const [note, setNote] = useState('');
     const [readyDate, setReadyDate] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // AI States
+    const [aiPrompt, setAiPrompt] = useState('');
+    const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+    const [isGenerating, setIsGenerating] = useState(false);
 
     if (!request) {
         return (
@@ -40,6 +58,22 @@ export default function VendorRequestDetailPage() {
 
     // Check if we already offered (In a real app, check if current vendor offered)
     // For now, simple check based on request status or a flag could be used, but allow multiple offers for demo.
+
+    const template = request.spec.templateId ? getTemplateById(request.spec.templateId) : null;
+
+    const handleGenerateAI = () => {
+        if (!aiPrompt.trim()) return;
+        setIsGenerating(true);
+        // Simulate AI Gen
+        setTimeout(() => {
+            setGeneratedImage('https://images.unsplash.com/photo-1599785209707-a456fc1337bb?w=800');
+            setIsGenerating(false);
+            toast({
+                title: 'Görsel Oluşturuldu',
+                description: 'Yapay zeka istediğiniz konsepti hazırladı.',
+            });
+        }, 1500);
+    };
 
     const handleSubmitOffer = () => {
         if (!price || !readyDate) {
@@ -143,16 +177,93 @@ export default function VendorRequestDetailPage() {
                         </CardContent>
                     </Card>
 
-                    {request.conceptImage && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-sm">Konsept Görsel</CardTitle>
+                    {/* Section 1: Fixed Customer Request Visual */}
+                    {(request.conceptImage || template) && (
+                        <Card className="overflow-hidden border-2 border-slate-100 shadow-sm">
+                            <CardHeader className="bg-slate-50 border-b p-4">
+                                <CardTitle className="text-[11px] font-black uppercase tracking-widest flex items-center gap-2 text-slate-500">
+                                    <ImageIcon className="h-4 w-4" /> Müşteri Talebi (Sabit)
+                                </CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <img src={request.conceptImage} alt="Referans" className="rounded-lg w-full object-cover max-h-60" />
+                            <CardContent className="p-0">
+                                <div className="relative">
+                                    <img
+                                        src={request.conceptImage || template?.image}
+                                        alt="Müşteri Talebi"
+                                        className="w-full object-cover max-h-80 grayscale-[0.2]"
+                                    />
+                                    <div className="absolute bottom-3 left-3">
+                                        {template ? (
+                                            <Badge className="bg-blue-600 text-white border-0 shadow-lg">Şeblon Üzerinden</Badge>
+                                        ) : (
+                                            <Badge className="bg-slate-900 text-white border-0 shadow-lg">Özel Konsept</Badge>
+                                        )}
+                                    </div>
+                                </div>
                             </CardContent>
                         </Card>
                     )}
+
+                    {/* Section 2: Vendor AI Counter-Offer / Concept */}
+                    <Card className="border-2 border-purple-100 bg-purple-50/20 overflow-hidden shadow-sm">
+                        <CardHeader className="p-4 border-b border-purple-100 bg-purple-50 flex flex-row items-center justify-between">
+                            <CardTitle className="text-[11px] font-black uppercase tracking-widest text-purple-700 flex items-center gap-2">
+                                <Sparkles className="h-4 w-4" /> Pastane Önerisi (AI)
+                            </CardTitle>
+                            {generatedImage && (
+                                <Badge className="bg-purple-600 text-white border-0 text-[10px]">Yeni Konsept Üretildi</Badge>
+                            )}
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            {generatedImage ? (
+                                <div className="relative group">
+                                    <img
+                                        src={generatedImage}
+                                        alt="Pastane Önerisi"
+                                        className="w-full object-cover max-h-80"
+                                    />
+                                    <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-purple-900/80 to-transparent flex justify-end">
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            className="text-white hover:bg-white/10 text-[10px] font-bold h-7"
+                                            onClick={() => setGeneratedImage(null)}
+                                        >
+                                            <RefreshCw className="h-3 w-3 mr-1" /> Yeniden Üret
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="p-6 flex flex-col items-center justify-center text-center gap-3">
+                                    <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                                        <Wand2 className="h-6 w-6 text-purple-600" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-xs font-bold text-slate-700">Counter Offer için Görsel Üret</p>
+                                        <p className="text-[10px] text-slate-500 max-w-[200px]">Müşteriye kendi yorumunuzu katmak için AI ile görsel hazırlayın.</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="p-4 border-t border-purple-100 bg-white">
+                                <div className="flex gap-2">
+                                    <Input
+                                        placeholder="Kendi konseptinizi tarif edin..."
+                                        className="bg-slate-50 border-slate-200 text-sm focus-visible:ring-purple-500 h-10 rounded-xl"
+                                        value={aiPrompt}
+                                        onChange={(e) => setAiPrompt(e.target.value)}
+                                    />
+                                    <Button
+                                        className="bg-purple-600 hover:bg-purple-700 shrink-0 h-10 w-10 p-0 rounded-xl transition-transform active:scale-95"
+                                        onClick={handleGenerateAI}
+                                        disabled={isGenerating || !aiPrompt.trim()}
+                                    >
+                                        {isGenerating ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* Offer & Chat Column */}

@@ -48,7 +48,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
     };
 
-    const logout = () => setUser(null);
+    const logout = () => {
+        setUser(null);
+        // Clear wizard state on logout
+        localStorage.removeItem('wizard_view');
+        localStorage.removeItem('pending_request_id');
+        localStorage.removeItem('pending_design_data');
+        localStorage.removeItem('pending_images');
+        localStorage.removeItem('pending_chat');
+        localStorage.removeItem('pending_step');
+        localStorage.removeItem('pending_ai_image');
+        localStorage.removeItem('pending_design_name');
+        localStorage.removeItem('auto_submit');
+    };
     const switchRole = (role: UserRole) => setUser(mockUsers[role]);
 
     return (
