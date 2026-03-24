@@ -22,8 +22,8 @@ type SortOption = "popular" | "price_asc" | "price_desc" | "newest";
 export default function TemplatesPage() {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState<string>("all");
-    const [selectedOccasion, setSelectedOccasion] = useState<string>("all");
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
     const [sortBy, setSortBy] = useState<SortOption>("popular");
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -32,12 +32,12 @@ export default function TemplatesPage() {
     // Derive unique categories and occasions from data
     const categories = useMemo(() => {
         const cats = new Set(mockTemplateProducts.map(p => p.category));
-        return ["all", ...cats];
+        return Array.from(cats);
     }, []);
 
     const occasions = useMemo(() => {
         const occs = new Set(mockTemplateProducts.map(p => p.occasion).filter(Boolean) as string[]);
-        return ["all", ...occs];
+        return Array.from(occs);
     }, []);
 
     const allDietaryLabels = useMemo(() => {
@@ -64,13 +64,13 @@ export default function TemplatesPage() {
         }
 
         // Category
-        if (selectedCategory !== "all") {
-            result = result.filter((p) => p.category === selectedCategory);
+        if (selectedCategories.length > 0) {
+            result = result.filter((p) => selectedCategories.includes(p.category));
         }
 
         // Occasion
-        if (selectedOccasion !== "all") {
-            result = result.filter((p) => p.occasion === selectedOccasion);
+        if (selectedOccasions.length > 0) {
+            result = result.filter((p) => selectedOccasions.includes(p.occasion));
         }
 
         // Dietary
@@ -101,21 +101,33 @@ export default function TemplatesPage() {
         });
 
         return sorted;
-    }, [searchQuery, selectedCategory, selectedOccasion, priceRange, sortBy, selectedDietary]);
+    }, [searchQuery, selectedCategories, selectedOccasions, priceRange, sortBy, selectedDietary]);
 
     const activeFilterCount = [
-        selectedCategory !== "all",
-        selectedOccasion !== "all",
+        selectedCategories.length > 0,
+        selectedOccasions.length > 0,
         priceRange[0] > 0 || priceRange[1] < 5000,
         selectedDietary.length > 0,
     ].filter(Boolean).length;
 
     const clearFilters = () => {
-        setSelectedCategory("all");
-        setSelectedOccasion("all");
+        setSelectedCategories([]);
+        setSelectedOccasions([]);
         setPriceRange([0, 5000]);
         setSortBy("popular");
         setSelectedDietary([]);
+    };
+
+    const toggleCategory = (cat: string) => {
+        setSelectedCategories(prev =>
+            prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+        );
+    };
+
+    const toggleOccasion = (occ: string) => {
+        setSelectedOccasions(prev =>
+            prev.includes(occ) ? prev.filter(o => o !== occ) : [...prev, occ]
+        );
     };
 
     const toggleDietary = (label: string) => {
@@ -189,14 +201,21 @@ export default function TemplatesPage() {
                                 <div className="space-y-2">
                                     <h3 className="text-sm font-medium leading-none">Kategori</h3>
                                     <div className="flex flex-wrap gap-2">
+                                        <Badge
+                                            variant={selectedCategories.length === 0 ? "default" : "secondary"}
+                                            className="cursor-pointer capitalize px-3 py-1"
+                                            onClick={() => setSelectedCategories([])}
+                                        >
+                                            Tümü
+                                        </Badge>
                                         {categories.map((cat) => (
                                             <Badge
                                                 key={cat}
-                                                variant={selectedCategory === cat ? "default" : "secondary"}
+                                                variant={selectedCategories.includes(cat) ? "default" : "secondary"}
                                                 className="cursor-pointer capitalize px-3 py-1"
-                                                onClick={() => setSelectedCategory(cat)}
+                                                onClick={() => toggleCategory(cat)}
                                             >
-                                                {cat === "all" ? "Tümü" : cat}
+                                                {cat}
                                             </Badge>
                                         ))}
                                     </div>
@@ -206,14 +225,21 @@ export default function TemplatesPage() {
                                 <div className="space-y-2">
                                     <h3 className="text-sm font-medium leading-none">Etkinlik</h3>
                                     <div className="flex flex-wrap gap-2">
+                                        <Badge
+                                            variant={selectedOccasions.length === 0 ? "default" : "secondary"}
+                                            className="cursor-pointer capitalize px-3 py-1"
+                                            onClick={() => setSelectedOccasions([])}
+                                        >
+                                            Tümü
+                                        </Badge>
                                         {occasions.map((occ) => (
                                             <Badge
                                                 key={occ}
-                                                variant={selectedOccasion === occ ? "default" : "secondary"}
+                                                variant={selectedOccasions.includes(occ) ? "default" : "secondary"}
                                                 className="cursor-pointer capitalize px-3 py-1"
-                                                onClick={() => setSelectedOccasion(occ)}
+                                                onClick={() => toggleOccasion(occ)}
                                             >
-                                                {occ === "all" ? "Tümü" : occ.replace("_", " ")}
+                                                {occ.replace("_", " ")}
                                             </Badge>
                                         ))}
                                     </div>
@@ -274,20 +300,20 @@ export default function TemplatesPage() {
                 {/* Quick Filter Bar */}
                 <div className="px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar pb-3">
                     <Button
-                        variant={selectedCategory === 'all' ? "default" : "outline"}
+                        variant={selectedCategories.length === 0 ? "default" : "outline"}
                         size="sm"
                         className="rounded-full h-8 text-xs shrink-0"
-                        onClick={() => setSelectedCategory('all')}
+                        onClick={() => setSelectedCategories([])}
                     >
                         Tümü
                     </Button>
-                    {categories.filter(c => c !== 'all').map((cat) => (
+                    {categories.map((cat) => (
                         <Button
                             key={cat}
-                            variant={selectedCategory === cat ? "default" : "outline"}
+                            variant={selectedCategories.includes(cat) ? "default" : "outline"}
                             size="sm"
                             className="rounded-full h-8 text-xs shrink-0 capitalize"
-                            onClick={() => setSelectedCategory(cat)}
+                            onClick={() => toggleCategory(cat)}
                         >
                             {cat}
                         </Button>

@@ -44,6 +44,26 @@ export default function DesignWizardPage() {
     const [currentStep, setCurrentStep] = useState(wizardMode === 'template_revision' ? 2 : 1);
     const [loading, setLoading] = useState(false);
     const [hasAllergy, setHasAllergy] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
+
+    // Smart Sticky Bar Logic
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                // Scrolling DOWN
+                setIsVisible(false);
+            } else {
+                // Scrolling UP
+                setIsVisible(true);
+            }
+            setLastScrollY(currentScrollY);
+        };
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [lastScrollY]);
 
     const [formData, setFormData] = useState<Partial<CustomRequestSpec>>({
         occasion: "dogum_gunu",
@@ -217,11 +237,25 @@ export default function DesignWizardPage() {
     useEffect(() => {
         const isFirstVisit = chatMessages.length === 0 || (chatMessages.length === 1 && chatMessages[0].role === 'ai');
         if (currentStep === 3 && isFirstVisit) {
-            const generatedPrompt = generateMeaningfulPrompt(formData, hasAllergy);
-            setUserPrompt(generatedPrompt);
+            const getVal = (cat: string) => {
+                const val = formData[cat as keyof CustomRequestSpec] as string;
+                if (val === 'Özel') return formData.customOptions?.[cat] || '';
+                return val;
+            };
+
+            const recipientText = formData.recipient === 'Özel' ? formData.customOptions?.recipient : formData.recipient;
+            const occasionText = formData.occasion === 'diger' ? (formData.customOccasion || 'Özel') : (formData.occasion === 'dogum_gunu' ? 'Doğum Günü' : formData.occasion?.replace("_", " "));
+            const portionsText = formData.portions ? `${formData.portions} kişilik` : 'bir';
+            const flavor = getVal('flavor') || '---';
+            const filling = getVal('filling') || '---';
+            const frosting = getVal('frosting') || '---';
+
+            const summaryMessage = `"${recipientText} için ${flavor} kekli, ${filling} dolgulu ve ${frosting} kaplamalı ${portionsText} bir ${occasionText} pastası istediğini söyledin. Şimdi pastanın nasıl gözükmesini istediğini tarif edebilirsin."`;
+
             const initialMessage = wizardMode === 'template_revision' && template
-                ? `Merhaba! Seçmiş olduğunuz "${template.name}" tasarımı üzerinde ne gibi özelleştirmeler yapalım? İşte başlangıç fikrimiz: "${generatedPrompt}"`
-                : `Merhaba! Hayalindeki pastayı tasarlamaya hazır mısın? Seçimlerine göre şöyle bir başlangıç yapabiliriz: "${generatedPrompt}"`;
+                ? `Merhaba! Seçmiş olduğunuz "${template.name}" tasarımı üzerinde ne gibi özelleştirmeler yapalım? ${summaryMessage}`
+                : `Merhaba! Hayalindeki pastayı tasarlamaya hazır mısın? ${summaryMessage}`;
+
             setChatMessages([{ role: 'ai', text: initialMessage }]);
         }
     }, [currentStep, formData]);
@@ -300,10 +334,10 @@ export default function DesignWizardPage() {
             role: 'ai',
             text: `İsteklerinize göre tasarımları hazırladım. Lütfen birini seçin:`,
             images: [
-                "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500",
-                "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=500",
-                "https://images.unsplash.com/photo-1558636508-e0db3814bd1d?w=500",
-                "https://images.unsplash.com/photo-1535254973040-607b474cb8c2?w=500"
+                "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=500&q=80",
+                "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=500&q=80",
+                "https://images.unsplash.com/photo-1464344580461-991823126764?auto=format&fit=crop&w=500&q=80",
+                "https://images.unsplash.com/photo-1535254973040-607b474cb8c2?auto=format&fit=crop&w=500&q=80"
             ],
             imageNames: designNames
         }]);
@@ -518,8 +552,8 @@ export default function DesignWizardPage() {
                         </div>
                     </div>
 
-                    {/* Summary Actions Footer */}
-                    <div className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md p-4 border-t flex flex-col gap-3 max-w-2xl mx-auto w-full z-50">
+                    {/* Summary Actions Footer - Sticky to stop at footer */}
+                    <div className={`sticky bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md p-4 border-t flex flex-col gap-3 max-w-2xl mx-auto w-full shadow-[0_-10px_40px_rgba(0,0,0,0.05)] mt-auto transition-transform duration-300 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}>
                         <div className="grid grid-cols-2 gap-3">
                             <Button variant="outline" size="lg" className="rounded-2xl h-14" onClick={() => navigate("/")} disabled={isNotesDirty}>Anasayfa</Button>
                             <Button variant="outline" size="lg" className="rounded-2xl h-14" onClick={() => navigate("/taleplerim")} disabled={isNotesDirty}>Taleplerim</Button>
@@ -651,18 +685,66 @@ export default function DesignWizardPage() {
                 )}
 
                 {currentStep === 3 && (
-                    <div className="animate-in fade-in slide-in-from-right-4 duration-500 h-[60vh] flex flex-col gap-4">
-                        <div className="flex-1 overflow-y-auto space-y-4 pr-2">
-                            {chatMessages.map((msg, i) => (
-                                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[85%] rounded-2xl p-4 ${msg.role === 'user' ? 'bg-primary text-white' : 'bg-white border-2'}`}>
-                                        <p className="text-sm">{msg.text}</p>
+                    <div className="animate-in fade-in slide-in-from-right-4 duration-500 flex flex-col gap-6 relative min-h-[70vh]">
+                        {/* 3D Floating Chef (Clippy Style) - STICKY WITHIN CONTENT */}
+                        <div className="sticky top-4 z-[40] pointer-events-none mb-[-60px] md:mb-[-100px]">
+                            <div className="relative flex flex-row items-start animate-in slide-in-from-left-8 duration-700 max-w-[95vw] md:max-w-md">
+                                {/* 3D Character */}
+                                <div className="h-20 w-20 md:h-32 md:w-32 pointer-events-auto transform transition-all hover:scale-110 active:scale-95 duration-500 drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] flex-shrink-0 z-10">
+                                    <div className="w-full h-full rounded-full overflow-hidden border-4 border-white bg-white/80 backdrop-blur-md relative shadow-inner">
+                                        <img 
+                                            src="/3d-chef.png" 
+                                            className="w-full h-full object-cover scale-[1.3] translate-y-3" 
+                                            alt="Chef" 
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Speech Bubble - Appears to the right of the character */}
+                                {chatMessages.length > 0 && chatMessages[chatMessages.length - 1].role === 'ai' && (
+                                    <div className="relative ml-2 mt-2 md:mt-4 p-3 md:p-5 bg-white rounded-2xl md:rounded-[2rem] border-2 border-primary/20 shadow-[0_20px_50px_rgba(0,0,0,0.1)] pointer-events-auto animate-in zoom-in-50 slide-in-from-left-5 duration-500 flex-1 max-w-[200px] md:max-w-full">
+                                        <div className="relative">
+                                            <p className="text-[9px] md:text-xs font-black text-slate-800 leading-tight uppercase tracking-wider text-primary">Şef Selin</p>
+                                            <p className="mt-1 text-[11px] md:text-sm font-medium text-slate-700 leading-relaxed line-clamp-4 md:line-clamp-none">
+                                                {chatMessages[chatMessages.length - 1].text.length > 150 
+                                                    ? chatMessages[chatMessages.length - 1].text.substring(0, 150) + '...' 
+                                                    : chatMessages[chatMessages.length - 1].text}
+                                            </p>
+                                        </div>
+                                        {/* Bubble Pointer pointing LEFT towards the chef */}
+                                        <div className="absolute top-4 md:top-6 -left-2 w-4 h-4 bg-white border-l-2 border-t-2 border-primary/20 -rotate-45" />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Conversations Area (Traditional Chat but cleaner) */}
+                        <div className="flex-1 space-y-6 overflow-y-visible pb-40 px-2 md:px-0">
+                            {chatMessages.filter(m => m.role === 'user' || m.images).map((msg, i) => (
+                                <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} gap-2`}>
+                                    <div className={`relative max-w-[85%] rounded-[1.8rem] p-5 text-sm leading-relaxed shadow-sm ${msg.role === 'user'
+                                        ? 'bg-slate-900 text-white'
+                                        : 'bg-white border-2 border-slate-100 text-slate-700'
+                                        }`}>
+                                        <p>{msg.text}</p>
+
                                         {msg.images && (
-                                            <div className="mt-4 grid grid-cols-2 gap-2">
+                                            <div className="mt-4 grid grid-cols-2 gap-3">
                                                 {msg.images.map((img, idx) => (
-                                                    <div key={idx} onClick={() => handleSelectImage(i, img, msg.imageNames?.[idx] || "Tasarım")} className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border-2 ${msg.selectedImage === img ? "border-primary shadow-lg scale-95" : "border-transparent"}`}>
+                                                    <div
+                                                        key={idx}
+                                                        onClick={() => handleSelectImage(i, img, msg.imageNames?.[idx] || "Tasarım")}
+                                                        className={`relative aspect-square rounded-2xl overflow-hidden cursor-pointer border-4 transition-all duration-300 group ${msg.selectedImage === img
+                                                            ? "border-primary shadow-xl shadow-primary/20 scale-100"
+                                                            : "border-transparent opacity-90 grayscale-[30%] hover:grayscale-0"
+                                                            }`}
+                                                    >
                                                         <img src={img} className="w-full h-full object-cover" />
-                                                        {msg.selectedImage === img && <div className="absolute top-1 right-1 bg-primary text-white p-0.5 rounded-full"><Check className="h-3 w-3" /></div>}
+                                                        {msg.selectedImage === img && (
+                                                            <div className="absolute top-2 right-2 bg-primary text-white p-1 rounded-full shadow-lg">
+                                                                <Check className="h-4 w-4" />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 ))}
                                             </div>
@@ -672,34 +754,94 @@ export default function DesignWizardPage() {
                             ))}
                             <div ref={chatEndRef} />
                         </div>
-                        <div className="relative space-y-3">
-                            <div className="flex gap-2 h-10 overflow-x-auto">
-                                {referenceImages.map((img, i) => (
-                                    <div key={i} className="relative h-8 w-8 rounded overflow-hidden border">
-                                        <img src={img} className="h-full w-full object-cover" />
-                                        <button onClick={() => setReferenceImages(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-0 right-0 bg-red-500 text-white p-0.5"><Trash2 className="h-2 w-2" /></button>
-                                    </div>
-                                ))}
-                            </div>
-                            <Textarea placeholder="Tasarımı detaylandırın..." className="min-h-[100px] rounded-2xl focus:ring-primary/20" value={userPrompt} onChange={e => setUserPrompt(e.target.value)} />
-                            <div className="absolute bottom-3 right-3 flex gap-2">
-                                <input type="file" ref={fileInputRef} className="hidden" multiple accept="image/*" onChange={handleFileChange} />
-                                <button onClick={() => fileInputRef.current?.click()} className="p-2 bg-slate-100 rounded-xl"><Upload className="h-5 w-5" /></button>
-                                <button onClick={handleAISend} disabled={loading || !userPrompt.trim()} className="p-2 bg-blue-600 text-white rounded-xl"><Send className="h-5 w-5" /></button>
+
+                        {/* Input Area */}
+                        <div className="space-y-4">
+                            <div className="bg-white rounded-[2.5rem] border-2 border-slate-100 p-2 shadow-xl shadow-slate-200/50 focus-within:border-primary transition-all">
+                                <div className="flex gap-2 p-2 px-4 h-10 overflow-x-auto no-scrollbar">
+                                    {referenceImages.map((img, i) => (
+                                        <div key={i} className="relative h-8 w-8 rounded-lg overflow-hidden border-2 border-slate-100 shrink-0 group">
+                                            <img src={img} className="h-full w-full object-cover" />
+                                            <button
+                                                onClick={() => setReferenceImages(prev => prev.filter((_, idx) => idx !== i))}
+                                                className="absolute inset-0 bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {referenceImages.length === 0 && (
+                                        <span className="text-xs text-slate-400 font-medium py-1">Referans fotoğraf ekleyebilirsin...</span>
+                                    )}
+                                </div>
+
+                                <div className="flex items-end gap-2 p-2">
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        className="hidden"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                    />
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-12 w-12 rounded-full hover:bg-slate-100"
+                                        onClick={() => fileInputRef.current?.click()}
+                                    >
+                                        <Upload className="h-5 w-5 text-slate-400" />
+                                    </Button>
+
+                                    <Textarea
+                                        placeholder="Nasıl bir pasta hayal ediyorsun? (Örn: Mickey Mouse temalı, yıldızlı...)"
+                                        className="min-h-[60px] max-h-[150px] border-0 focus-visible:ring-0 text-slate-700 bg-transparent py-3 placeholder:text-slate-300 font-medium"
+                                        value={userPrompt}
+                                        onChange={e => setUserPrompt(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                e.preventDefault();
+                                                handleAISend();
+                                            }
+                                        }}
+                                    />
+
+                                    <Button
+                                        onClick={handleAISend}
+                                        disabled={loading || !userPrompt.trim()}
+                                        className="h-12 w-12 rounded-full shadow-lg shadow-primary/20 p-0"
+                                    >
+                                        <Send className="h-5 w-5" />
+                                    </Button>
+                                </div>
                             </div>
                         </div>
+
                         {selectedAIImage && (
-                            <div className="flex items-center justify-between p-3 bg-primary/5 rounded-2xl border border-primary/10">
+                            <div className="animate-in slide-in-from-bottom-5 duration-500 p-4 bg-slate-900 rounded-[2rem] border border-white/10 shadow-2xl flex items-center justify-between gap-4 sticky bottom-20 md:bottom-4 z-30">
                                 <div className="flex items-center gap-3">
-                                    <img src={selectedAIImage} className="w-10 h-10 rounded-lg object-cover border" />
+                                    <div className="h-14 w-14 rounded-2xl overflow-hidden border-2 border-white/20">
+                                        <img src={selectedAIImage} className="w-full h-full object-cover" />
+                                    </div>
                                     <div>
-                                        <p className="text-[11px] font-black uppercase text-primary">{editableDesignName}</p>
-                                        <p className="text-[10px] text-muted-foreground">Tasarım Hazır</p>
+                                        <p className="text-[10px] font-black uppercase text-white/50 tracking-widest">Seçilen Tasarım</p>
+                                        <h4 className="text-sm font-black text-white">{editableDesignName}</h4>
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold" onClick={resetAI}>Sıfırla</Button>
-                                    <Button size="sm" className="h-8 text-[10px] font-bold gap-1" onClick={() => setShowConfirmDialog(true)}>Talep Oluştur <ArrowRight className="h-3 w-3" /></Button>
+                                    <Button
+                                        variant="ghost"
+                                        className="h-12 w-12 rounded-full text-white/50 hover:text-white hover:bg-white/10"
+                                        onClick={resetAI}
+                                    >
+                                        <Trash2 className="h-5 w-5" />
+                                    </Button>
+                                    <Button
+                                        className="h-12 rounded-full px-6 font-black bg-white text-slate-900 hover:bg-slate-100"
+                                        onClick={() => setShowConfirmDialog(true)}
+                                    >
+                                        Bunu İstiyorum ✨
+                                    </Button>
                                 </div>
                             </div>
                         )}
@@ -708,7 +850,7 @@ export default function DesignWizardPage() {
             </div>
 
             {view === 'wizard' && currentStep !== 3 && (
-                <div className="fixed bottom-0 inset-x-0 z-20 bg-background/90 backdrop-blur-md px-4 py-4 border-t flex gap-3 max-w-2xl mx-auto w-full">
+                <div className="fixed bottom-16 md:bottom-0 left-1/2 -translate-x-1/2 z-20 w-full max-w-2xl bg-background/90 backdrop-blur-md px-4 py-4 border-t flex gap-3 shadow-lg">
                     {currentStep > 1 && <Button variant="outline" size="lg" className="flex-1 rounded-2xl h-14" onClick={handleBack}>Geri</Button>}
                     <Button size="lg" className="flex-[2] rounded-2xl h-14 font-black shadow-primary/20" onClick={handleNext} disabled={loading || (currentStep === 1 && !isStep1Valid()) || (currentStep === 2 && !isStep2Valid())}>
                         {currentStep === STEPS.length ? (loading ? 'Oluşturuluyor...' : 'Onayla ve Gönder') : 'Devam Et'}

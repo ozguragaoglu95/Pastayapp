@@ -19,14 +19,35 @@ const TemplateDetail = () => {
     const vendor = template ? getVendorById(template.vendorId) : undefined;
 
     const [selectedOptions, setSelectedOptions] = useState<Record<string, string[]>>({});
-    const [quantity, setQuantity] = useState(1);
+    const [portionCount, setPortionCount] = useState<number>(0);
+    const [cakeCount, setCakeCount] = useState<number>(1);
     const [activeImage, setActiveImage] = useState(0);
     const [cakeNote, setCakeNote] = useState("");
     const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
-    const [theme, setTheme] = useState(template?.name || "");
+    const [theme, setTheme] = useState("");
     const [recipient, setRecipient] = useState("");
     const [hasAllergy, setHasAllergy] = useState(false);
     const [allergyInfo, setAllergyInfo] = useState("");
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
+
+    // Smart Sticky Bar Logic
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                // Scrolling DOWN
+                setIsVisible(false);
+            } else {
+                // Scrolling UP
+                setIsVisible(true);
+            }
+            setLastScrollY(currentScrollY);
+        };
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [lastScrollY]);
 
     const extrasList = [
         { id: 'candle', label: 'Mum (Ücretsiz)', price: 0 },
@@ -48,7 +69,8 @@ const TemplateDetail = () => {
         if (state?.editItem) {
             const item = state.editItem;
             setSelectedOptions(item.selectedOptions || {});
-            setQuantity(item.quantity || 1);
+            setPortionCount(item.quantity || 1);
+            setCakeCount(1); // Standardizing to 1 cake per list item
             setCakeNote(item.cakeNote || "");
 
             if (item.customExtras) {
@@ -74,17 +96,21 @@ const TemplateDetail = () => {
         if (!template) return 0;
         let price = template.basePrice;
 
-        // Portions Price Diff
-        if (quantity >= 10 && quantity < 15) price += 150;
-        if (quantity >= 15) price += 300;
+        // Portions Price Diff (Surcharge based on range)
+        if (portionCount >= 10 && portionCount < 15) price += 150;
+        if (portionCount >= 15) price += 300;
 
         const extrasPrice = selectedExtras.reduce((sum, extraId) => {
             const extra = extrasList.find(e => e.id === extraId);
             return sum + (extra?.price || 0);
         }, 0);
 
-        return (price + extrasPrice) * quantity;
-    }, [template, quantity, selectedExtras]);
+        return (price + extrasPrice) * cakeCount;
+    }, [template, portionCount, selectedExtras, cakeCount]);
+
+    const isFormValid = useMemo(() => {
+        return theme !== "" && recipient !== "" && portionCount > 0;
+    }, [theme, recipient, portionCount]);
 
     if (!template || !vendor) {
         return (
@@ -168,13 +194,9 @@ const TemplateDetail = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="rounded-xl bg-secondary/50 p-2.5 text-center">
-                        <Users className="h-4 w-4 mx-auto text-muted-foreground" />
-                        <p className="mt-0.5 text-xs font-semibold">{template.portionCount} kişi</p>
-                    </div>
-                    <div className="rounded-xl bg-secondary/50 p-2.5 text-center">
+                    <div className="rounded-xl bg-secondary/50 p-2.5 text-center col-span-2">
                         <Clock className="h-4 w-4 mx-auto text-muted-foreground" />
-                        <p className="mt-0.5 text-xs font-semibold">{template.prepTimeDays} gün</p>
+                        <p className="mt-0.5 text-xs font-semibold">{template.prepTimeDays} gün önceden sipariş</p>
                     </div>
                 </div>
 
@@ -225,7 +247,7 @@ const TemplateDetail = () => {
                         </Label>
                         <div className="flex gap-2">
                             {["6-10", "10-15", "15+"].map((p) => {
-                                const isSelected = (p === "6-10" && quantity < 10) || (p === "10-15" && quantity >= 10 && quantity < 15) || (p === "15+" && quantity >= 15);
+                                const isSelected = (p === "6-10" && portionCount > 0 && portionCount < 10) || (p === "10-15" && portionCount >= 10 && portionCount < 15) || (p === "15+" && portionCount >= 15);
                                 let priceDiff = 0;
                                 if (p === "10-15") priceDiff = 150;
                                 if (p === "15+") priceDiff = 300;
@@ -233,12 +255,12 @@ const TemplateDetail = () => {
                                 return (
                                     <button
                                         key={p}
-                                        onClick={() => setQuantity(p === "6-10" ? 8 : (p === "10-15" ? 12 : 20))}
+                                        onClick={() => setPortionCount(p === "6-10" ? 8 : (p === "10-15" ? 12 : 20))}
                                         className={`flex-1 px-2 py-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${isSelected ? "border-primary bg-primary/5 text-primary" : "border-slate-100 bg-white text-slate-500"
                                             }`}
                                     >
                                         <span className="text-xs font-black">{p}</span>
-                                        {priceDiff > 0 && <span className="text-[9px] font-bold opacity-70">+{priceDiff}₺</span>}
+                                        {priceDiff > 0 && <span className="text-[9px] font-bold opacity-70">+{priceDiff}₺ Fark</span>}
                                     </button>
                                 );
                             })}
@@ -248,28 +270,73 @@ const TemplateDetail = () => {
                 </div>
             </div>
 
-            {/* Sticky bottom bar */}
-            <div className="fixed bottom-16 inset-x-0 z-20 border-t bg-white/90 backdrop-blur-md px-4 py-3 safe-bottom">
-                <div className="flex items-center justify-between gap-4 max-w-lg mx-auto">
-                    <div>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">TOPLAM</p>
+            {/* Smart Sticky bottom bar - Hides on scroll down, stop at footer */}
+            <div className={`sticky bottom-0 left-0 right-0 z-20 w-full border-t bg-white/95 backdrop-blur-xl px-4 py-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] mt-auto transition-transform duration-300 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}>
+                {/* Mobile BottomNav offset for sticky bar */}
+                <div className="md:hidden h-[72px] absolute -top-[72px] pointer-events-none" />
+                
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 max-w-5xl mx-auto">
+                    <div className="hidden md:block">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">TOPLAM FİYAT</p>
                         <p className="text-2xl font-display font-black text-primary">
-                            {formatPrice(totalPrice)}
+                            {portionCount > 0 ? formatPrice(totalPrice) : "---"}
                         </p>
                     </div>
-                    <Button
-                        size="lg"
-                        className="gap-2 rounded-full font-black flex-1 max-w-[200px] shadow-lg shadow-primary/20 h-14 bg-slate-900 hover:bg-slate-800 text-white"
-                        asChild
-                    >
-                        <Link to={`/tasarla?reset=true&template=${template.id}&vendor=${vendor.id}&recipient=${recipient}&theme=${theme}&portions=${quantity <= 10 ? "6-10" : (quantity <= 15 ? "10-15" : "15+")}`}>
-                            <Sparkles className="h-5 w-5 text-yellow-400" />
-                            Tasarla 🎂
-                        </Link>
-                    </Button>
+                    
+                    <div className="flex items-center gap-3 w-full md:w-auto">
+                        <div className="md:hidden flex-1">
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">TOPLAM</p>
+                            <p className="text-xl font-display font-black text-primary">
+                                {portionCount > 0 ? formatPrice(totalPrice) : "---"}
+                            </p>
+                        </div>
+                        
+                        <Button
+                            variant="outline"
+                            size="lg"
+                            disabled={!isFormValid}
+                            className="flex-1 md:w-48 h-14 rounded-2xl font-bold border-2 border-slate-200 hover:bg-slate-50 text-slate-700 disabled:opacity-40 transition-all"
+                            onClick={() => {
+                                addItem({
+                                    templateProductId: template.id,
+                                    unitPrice: totalPrice / cakeCount,
+                                    quantity: cakeCount,
+                                    selectedOptions: {
+                                        "Tema": [theme],
+                                        "Alıcı": [recipient],
+                                        "Kişi Sayısı": [portionCount <= 10 ? "6-10 Kişi" : (portionCount <= 15 ? "10-15 Kişi" : "15+ Kişi")]
+                                    },
+                                    recipient,
+                                    theme
+                                });
+                                navigate('/sepet');
+                            }}
+                        >
+                            Sipariş Ver
+                        </Button>
+
+                        <Button
+                            size="lg"
+                            disabled={!isFormValid}
+                            className="flex-1 md:w-56 h-14 bg-primary hover:bg-primary-hover text-white rounded-2xl font-black shadow-lg shadow-primary/20 gap-2 disabled:opacity-40 transition-all"
+                            asChild
+                        >
+                            {!isFormValid ? (
+                                <span className="flex items-center gap-2">
+                                    <Sparkles className="h-5 w-5 text-yellow-300 opacity-50" />
+                                    Özelleştir
+                                </span>
+                            ) : (
+                                <Link to={`/tasarla?reset=true&template=${template.id}&vendor=${vendor.id}&recipient=${recipient}&theme=${theme}&portions=${portionCount <= 10 ? "6-10" : (portionCount <= 15 ? "10-15" : "15+")}`}>
+                                    <Sparkles className="h-5 w-5 text-yellow-300" />
+                                    Özelleştir
+                                </Link>
+                            )}
+                        </Button>
+                    </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 

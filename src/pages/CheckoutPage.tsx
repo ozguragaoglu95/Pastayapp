@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, CreditCard, Truck, Store, User as UserIcon, Mail, Phone, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,26 @@ export default function CheckoutPage() {
     const [guestEmail, setGuestEmail] = useState("");
     const [guestPhone, setGuestPhone] = useState("");
     const [guestPassword, setGuestPassword] = useState(""); // If filled, register user
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
+
+    // Smart Sticky Bar Logic
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                // Scrolling DOWN
+                setIsVisible(false);
+            } else {
+                // Scrolling UP
+                setIsVisible(true);
+            }
+            setLastScrollY(currentScrollY);
+        };
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [lastScrollY]);
 
     if (items.length === 0 && !confirmed) {
         navigate("/sepet");
@@ -262,24 +282,26 @@ export default function CheckoutPage() {
                 </div>
             </div>
 
-            {/* Sticky confirm */}
-            <div className="fixed bottom-0 inset-x-0 z-20 border-t bg-background/90 backdrop-blur-md px-4 py-4 safe-bottom">
-                <Button
-                    size="lg"
-                    className="w-full font-semibold rounded-full gap-2"
-                    onClick={handleConfirm}
-                    disabled={isLoading}
-                >
-                    {isLoading ? (
-                        <span>İşleniyor...</span>
-                    ) : (
-                        <>
-                            <span>Siparişi Onayla</span>
-                            <span className="opacity-80">·</span>
-                            <span>{formatPrice(totalPrice)}</span>
-                        </>
-                    )}
-                </Button>
+            {/* Smart Sticky confirm - Integrated with flow to stop at footer */}
+            <div className={`sticky bottom-0 inset-x-0 z-20 border-t bg-background/95 backdrop-blur-md px-4 py-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] mt-auto transition-transform duration-300 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}>
+                <div className="max-w-xl mx-auto">
+                    <Button
+                        size="lg"
+                        className="w-full font-bold rounded-2xl h-14 shadow-lg shadow-primary/20"
+                        onClick={handleConfirm}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <span>İşleniyor...</span>
+                        ) : (
+                            <div className="flex items-center justify-center gap-2">
+                                <span>Siparişi Onayla</span>
+                                <span className="opacity-40">|</span>
+                                <span>{formatPrice(totalPrice)}</span>
+                            </div>
+                        )}
+                    </Button>
+                </div>
             </div>
         </div>
     );

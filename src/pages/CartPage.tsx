@@ -11,6 +11,26 @@ const CartPage = () => {
     const { items, updateQuantity, removeItem, totalPrice, clearCart } = useCart();
     const [couponCode, setCouponCode] = useState("");
     const [appliedDiscount, setAppliedDiscount] = useState(0); // 0.15 for 15%
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
+
+    // Smart Sticky Bar Logic
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                // Scrolling DOWN
+                setIsVisible(false);
+            } else {
+                // Scrolling UP
+                setIsVisible(true);
+            }
+            setLastScrollY(currentScrollY);
+        };
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [lastScrollY]);
 
     const handleApplyCoupon = () => {
         if (couponCode.toUpperCase() === "KEK15") {
@@ -197,9 +217,9 @@ const CartPage = () => {
             {/* Recently Viewed */}
             <RecentlyViewedSection />
 
-            {/* Sticky bottom */}
-            <div className="fixed bottom-0 inset-x-0 z-20 border-t bg-white/90 backdrop-blur-md px-4 py-4 safe-bottom shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
-                <div className="space-y-2 mb-4">
+            {/* Smart Sticky bottom bar - Integrated with flow to stop at footer */}
+            <div className={`sticky bottom-0 inset-x-0 z-20 border-t bg-white/95 backdrop-blur-md px-4 py-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] mt-auto transition-transform duration-300 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}>
+                <div className="max-w-xl mx-auto space-y-2 mb-4">
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <span>Ara Toplam</span>
                         <span>{formatPrice(totalPrice)}</span>
@@ -215,13 +235,15 @@ const CartPage = () => {
                         <span className="text-2xl font-display font-black text-primary">{formatPrice(discountedTotal)}</span>
                     </div>
                 </div>
-                <Button
-                    size="lg"
-                    className="w-full font-bold rounded-full h-12 shadow-lg shadow-primary/20"
-                    onClick={() => navigate("/odeme")}
-                >
-                    Siparişi Tamamla
-                </Button>
+                <div className="max-w-xl mx-auto">
+                    <Button
+                        size="lg"
+                        className="w-full font-bold rounded-2xl h-14 shadow-lg shadow-primary/20 bg-primary hover:bg-primary-hover text-white"
+                        onClick={() => navigate("/odeme")}
+                    >
+                        Siparişi Tamamla
+                    </Button>
+                </div>
             </div>
         </div>
     );

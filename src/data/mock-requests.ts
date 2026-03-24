@@ -30,7 +30,7 @@ export const mockRequests: CustomRequest[] = [
             {
                 id: 'of1',
                 requestId: 'r1',
-                vendorId: 'u-vendor1',
+                vendorId: 'v1',
                 totalPrice: 850,
                 earliestReady: '2026-03-14T12:00:00Z',
                 deliverySupported: true,
@@ -142,7 +142,7 @@ export const mockRequests: CustomRequest[] = [
             {
                 id: 'of4',
                 requestId: 'r4',
-                vendorId: 'u-vendor1',
+                vendorId: 'v1',
                 totalPrice: 1200,
                 earliestReady: '2026-03-04T10:00:00Z',
                 deliverySupported: true,
