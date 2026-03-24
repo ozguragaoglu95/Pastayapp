@@ -31,7 +31,7 @@ export default function VendorLayout() {
             <motion.aside
                 initial={false}
                 animate={{ width: isCollapsed ? 80 : 240 }}
-                className="hidden md:flex flex-col bg-sidebar border-r border-sidebar-border p-4 relative transition-all duration-300 ease-in-out"
+                className="hidden md:flex flex-col bg-sidebar border-r border-sidebar-border p-4 sticky top-0 h-screen flex-shrink-0 transition-all duration-300 ease-in-out z-50 overflow-y-auto"
             >
                 <div className={`font-display font-bold text-lg text-sidebar-foreground mb-8 flex items-center ${isCollapsed ? 'justify-center' : 'px-2'}`}>
                     {isCollapsed ? "🎂" : "🎂 Pastane"}
@@ -101,6 +101,28 @@ export default function VendorLayout() {
                         </PageTransition>
                     </AnimatePresence>
                 </main>
+
+                {/* Mobile Bottom Navigation for Vendor */}
+                <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-50 flex items-center justify-around py-3 px-2 safe-bottom shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                    {[
+                        ...sidebarItems,
+                        { to: '/pastane/ayarlar', icon: Settings, label: 'Ayarlar' }
+                    ].map(({ to, icon: Icon, label }) => {
+                        const active = location.pathname.startsWith(to) && (to !== '/pastane/panel' || location.pathname === '/pastane/panel');
+                        return (
+                            <Link
+                                key={to}
+                                to={to}
+                                className={`flex flex-col items-center gap-1 min-w-[64px] ${active ? 'text-primary' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                <Icon className={`h-6 w-6 transition-all ${active ? 'scale-110' : ''}`} />
+                                <span className={`text-[10px] font-bold transition-all ${active ? 'opacity-100' : 'opacity-70'}`}>
+                                    {label}
+                                </span>
+                            </Link>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );

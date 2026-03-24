@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, LogOut, User, LayoutDashboard } from 'lucide-react';
+import { ShoppingCart, LogOut, User, LayoutDashboard, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -26,9 +26,19 @@ export default function Header() {
     return (
         <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-lg border-b border-border">
             <div className="flex items-center justify-between h-16 px-4 max-w-7xl mx-auto">
-                <Link to="/" className="font-display font-bold text-xl text-gradient">
-                    CakeCraft
-                </Link>
+                <div className="flex items-center gap-2">
+                    {/* Back Button */}
+                    <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="md:hidden">
+                        <ArrowLeft className="h-5 w-5" />
+                    </Button>
+                    
+                    <Link to={user?.role === 'vendor' ? '/pastane/panel' : '/'} className="font-display font-bold text-xl text-gradient hidden md:block">
+                        Pastayapp
+                    </Link>
+                    <Link to={user?.role === 'vendor' ? '/pastane/panel' : '/'} className="font-display font-bold text-xl text-gradient md:hidden">
+                        Pastayapp
+                    </Link>
+                </div>
 
                 <div className="flex items-center gap-3">
                     {/* Public Nav */}

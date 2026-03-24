@@ -41,6 +41,10 @@ export default function VendorAddProductPage() {
                         <Label htmlFor="prep">Hazırlık Süresi (Gün)</Label>
                         <Input id="prep" type="number" placeholder="2" required />
                     </div>
+                    <div className="col-span-2 space-y-2">
+                        <Label htmlFor="min-portion">Minimum Kişi Sayısı</Label>
+                        <Input id="min-portion" type="number" placeholder="1" defaultValue="1" required />
+                    </div>
                 </div>
 
                 <div className="space-y-2">
