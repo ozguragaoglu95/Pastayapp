@@ -14,6 +14,7 @@ import VendorLayout from "@/components/layout/VendorLayout";
 import AdminLayout from "@/components/layout/AdminLayout";
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import ScrollToTop from "@/components/ScrollToTop";
 
 // Auth
 import LoginPage from "@/pages/auth/LoginPage";
@@ -67,6 +68,7 @@ const App = () => (
                             <Toaster />
                             <Sonner />
                             <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                                <ScrollToTop />
                                 <ErrorBoundary>
                                     <Routes>
                                         {/* Public Auth Routes */}

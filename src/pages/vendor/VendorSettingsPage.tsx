@@ -114,23 +114,23 @@ export default function VendorSettingsPage() {
                             </CardTitle>
                             <CardDescription className="font-medium">Müşterilerin göreceği genel bilgileriniz.</CardDescription>
                         </CardHeader>
-                        <CardContent className="p-8 space-y-6">
-                            <div className="grid grid-cols-2 gap-4">
+                        <CardContent className="p-4 md:p-8 space-y-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="font-bold text-slate-700">Kullanıcı Adı</Label>
-                                    <Input defaultValue={user?.username || "seker_atolyesi"} className="rounded-xl border-2 h-11" />
+                                    <Label className="font-bold text-slate-700 text-sm">Kullanıcı Adı</Label>
+                                    <Input defaultValue={user?.username || "seker_atolyesi"} className="rounded-xl border-2 h-11 text-sm" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="font-bold text-slate-700">Telefon No (SMS Onaylı)</Label>
+                                    <Label className="font-bold text-slate-700 text-sm">Telefon No (SMS Onaylı)</Label>
                                     <div className="relative">
-                                        <Input defaultValue={user?.phone || "+90 555 123 4567"} className="rounded-xl border-2 h-11 pr-10" />
+                                        <Input defaultValue={user?.phone || "+90 555 123 4567"} className="rounded-xl border-2 h-11 pr-10 text-sm" />
                                         <ShieldCheck className="absolute right-3 top-3 h-5 w-5 text-green-500" />
                                     </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="font-bold text-slate-700">Restoran Telefon No (Müşteri İletişimi)</Label>
+                                <div className="col-span-1 sm:col-span-2 space-y-2">
+                                    <Label className="font-bold text-slate-700 text-sm">Restoran Telefon No (Müşteri İletişimi)</Label>
                                     <div className="relative">
-                                        <Input defaultValue={user?.phone || "+90 555 123 4567"} className="rounded-xl border-2 h-11 pr-10 border-primary/20" />
+                                        <Input defaultValue={user?.phone || "+90 555 123 4567"} className="rounded-xl border-2 h-11 pr-10 border-primary/20 text-sm" />
                                         <Phone className="absolute right-3 top-3 h-5 w-5 text-primary" />
                                     </div>
                                     <p className="text-[10px] text-slate-400 font-medium italic">Müşteriler sipariş özelleştirmesi için bu numarayı arayacak.</p>
@@ -152,15 +152,15 @@ export default function VendorSettingsPage() {
                                 <Lock className="h-5 w-5 text-primary" /> Güvenlik & Şifre
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="p-8 space-y-6">
-                            <div className="grid grid-cols-2 gap-4">
+                        <CardContent className="p-4 md:p-8 space-y-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="font-bold text-slate-700">Yeni Şifre</Label>
-                                    <Input type="password" placeholder="••••••••" className="rounded-xl border-2 h-11" />
+                                    <Label className="font-bold text-slate-700 text-sm">Yeni Şifre</Label>
+                                    <Input type="password" placeholder="••••••••" className="rounded-xl border-2 h-11 text-sm" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="font-bold text-slate-700">Şifre Tekrar</Label>
-                                    <Input type="password" placeholder="••••••••" className="rounded-xl border-2 h-11" />
+                                    <Label className="font-bold text-slate-700 text-sm">Şifre Tekrar</Label>
+                                    <Input type="password" placeholder="••••••••" className="rounded-xl border-2 h-11 text-sm" />
                                 </div>
                             </div>
                         </CardContent>
@@ -173,9 +173,9 @@ export default function VendorSettingsPage() {
                             </CardTitle>
                             <CardDescription className="font-medium">Mağazanızın aktif olduğu gün ve saatleri belirleyin.</CardDescription>
                         </CardHeader>
-                        <CardContent className="p-8 space-y-4">
+                        <CardContent className="p-4 md:p-8 space-y-4">
                             {Object.entries(businessHours).map(([day, hours]) => (
-                                <div key={day} className="flex items-center gap-4 p-3 rounded-xl border-2 border-slate-100 hover:border-primary/20 transition-colors">
+                                <div key={day} className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 p-4 rounded-xl border-2 border-slate-100 hover:border-primary/20 transition-colors">
                                     <div className="flex items-center gap-3 flex-1">
                                         <Switch
                                             checked={!hours.closed}
@@ -186,12 +186,12 @@ export default function VendorSettingsPage() {
                                                 }));
                                             }}
                                         />
-                                        <Label className="font-bold text-slate-700 min-w-[100px]">
+                                        <Label className="font-bold text-slate-700 min-w-[100px] text-sm md:text-md">
                                             {dayNames[day as keyof typeof dayNames]}
                                         </Label>
                                     </div>
                                     {!hours.closed && (
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 justify-between sm:justify-start">
                                             <Select
                                                 value={hours.open}
                                                 onValueChange={(value) => {
@@ -201,7 +201,7 @@ export default function VendorSettingsPage() {
                                                     }));
                                                 }}
                                             >
-                                                <SelectTrigger className="w-[100px] h-9">
+                                                <SelectTrigger className="w-[100px] h-9 text-xs">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -220,7 +220,7 @@ export default function VendorSettingsPage() {
                                                     }));
                                                 }}
                                             >
-                                                <SelectTrigger className="w-[100px] h-9">
+                                                <SelectTrigger className="w-[100px] h-9 text-xs">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>

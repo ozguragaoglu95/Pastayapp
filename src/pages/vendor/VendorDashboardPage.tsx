@@ -101,10 +101,10 @@ export default function VendorDashboardPage() {
     return (
         <div className="flex flex-col gap-8 pb-32 container mx-auto p-4 md:p-8 max-w-6xl">
             {/* Profile Header Area */}
-            <div className="flex flex-col items-center justify-center py-6 gap-4 relative">
+            <div className="flex flex-col items-center justify-center py-4 md:py-6 gap-3 md:gap-4 relative">
                 {/* Restaurant Rating */}
                 <div className="absolute top-0 flex flex-col items-center gap-1">
-                    <div className="flex items-center gap-1 bg-yellow-400 text-white px-3 py-1 rounded-full text-xs font-black shadow-lg shadow-yellow-400/20">
+                    <div className="flex items-center gap-1 bg-yellow-400 text-white px-3 py-1 rounded-full text-[10px] md:text-xs font-black shadow-lg shadow-yellow-400/20">
                         <Star className="h-3 w-3 fill-white" />
                         <span>4.9</span>
                     </div>
@@ -113,14 +113,14 @@ export default function VendorDashboardPage() {
                 {/* Profile Button / Avatar */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className="h-24 w-24 rounded-full border-4 border-white shadow-2xl overflow-hidden hover:scale-105 transition-transform active:scale-95 group relative">
+                        <button className="h-20 w-20 md:h-24 md:w-24 rounded-full border-4 border-white shadow-2xl overflow-hidden hover:scale-105 transition-transform active:scale-95 group relative">
                             <img
                                 src={user?.avatar || "https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=200"}
                                 alt="Store"
                                 className="w-full h-full object-cover"
                             />
                             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                <Settings className="text-white h-6 w-6" />
+                                <Settings className="text-white h-5 w-5 md:h-6 md:w-6" />
                             </div>
                         </button>
                     </DropdownMenuTrigger>
@@ -140,28 +140,28 @@ export default function VendorDashboardPage() {
 
                 {/* Vendor Info Bar */}
                 <div className="text-center">
-                    <h1 className="font-display text-2xl font-black text-slate-900 capitalize">{user?.name || "Şeker Atölyesi"}</h1>
-                    <div className="flex items-center gap-4 mt-2">
+                    <h1 className="font-display text-xl md:text-2xl font-black text-slate-900 capitalize">{user?.name || "Şeker Atölyesi"}</h1>
+                    <div className="flex items-center gap-3 md:gap-4 mt-2">
                         <div className="flex flex-col items-center">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter">Sipariş</span>
-                            <span className="text-lg font-black text-slate-900">128</span>
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-tighter">Sipariş</span>
+                            <span className="text-base md:text-lg font-black text-slate-900">128</span>
                         </div>
-                        <div className="w-[1px] h-8 bg-slate-200" />
+                        <div className="w-[1px] h-6 md:h-8 bg-slate-200" />
                         <div className="flex flex-col items-center">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter">Puanlanan</span>
-                            <span className="text-lg font-black text-slate-900">112</span>
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-tighter">Puanlanan</span>
+                            <span className="text-base md:text-lg font-black text-slate-900">112</span>
                         </div>
-                        <div className="w-[1px] h-8 bg-slate-200" />
+                        <div className="w-[1px] h-6 md:h-8 bg-slate-200" />
                         <div className="flex flex-col items-center">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter">Yorum</span>
-                            <span className="text-lg font-black text-slate-900">84</span>
+                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-tighter">Yorum</span>
+                            <span className="text-base md:text-lg font-black text-slate-900">84</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Main Cards Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
                 {/* Marketplace Card */}
                 <button
                     onClick={() => setActiveTab('marketplace')}
