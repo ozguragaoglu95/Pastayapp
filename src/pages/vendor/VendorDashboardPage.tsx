@@ -417,11 +417,13 @@ export default function VendorDashboardPage() {
                                             </div>
                                             <Badge className={`rounded-lg border-0 ${order.status === 'preparing' ? 'bg-orange-500 text-white' :
                                                     order.status === 'completed' ? 'bg-cyan-500 text-white' :
-                                                        'bg-blue-500 text-white'
+                                                        order.status === 'shipped' ? 'bg-purple-500 text-white' :
+                                                            'bg-blue-500 text-white'
                                                 }`}>
                                                 {order.status === 'preparing' ? 'Hazırlanıyor' :
                                                     order.status === 'completed' ? 'Tamamlandı' :
-                                                        'Kabul Edildi'}
+                                                        order.status === 'shipped' ? 'Yolda' :
+                                                            'Kabul Edildi'}
                                             </Badge>
                                         </div>
 
