@@ -224,16 +224,16 @@ export default function VendorDashboardPage() {
 
             {/* Dynamic Slider Section */}
             <div className="bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-4 md:p-8 border-2 border-slate-100 shadow-sm relative overflow-hidden">
-                <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-xl font-black text-slate-900">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 md:mb-8 overflow-hidden">
+                    <h2 className="text-lg md:text-xl font-black text-slate-900 truncate w-full sm:w-auto">
                         {activeTab === 'marketplace' && "Genel İstekler (Pazar Yeri)"}
-                        {activeTab === 'special_requests' && "Size Özel Talepler (Ürün Üzerinden)"}
+                        {activeTab === 'special_requests' && "Size Özel Talepler"}
                         {activeTab === 'my_offers' && "Verdiğiniz Teklifler"}
                         {activeTab === 'orders' && "Güncel İşler"}
                     </h2>
                     <Link
-                        to={activeTab === 'marketplace' ? "/pastane/talepler?tab=marketplace" : activeTab === 'special_requests' ? "/pastane/talepler?tab=specialized" : activeTab === 'my_offers' ? "/pastane/talepler?tab=my_offers" : "/pastane/siparisler"}
-                        className="text-primary text-sm font-bold flex items-center gap-1 hover:underline"
+                        to={activeTab === 'marketplace' ? "/pastane/talepler?tab=marketplace" : activeTab === 'special_requests' ? "/pastane/talepler?tab=specialized" : "/pastane/talepler?tab=my_offers"}
+                        className="text-primary text-sm font-bold flex items-center gap-1 hover:underline shrink-0"
                     >
                         Tümünü Yönet <ChevronRight className="h-4 w-4" />
                     </Link>
@@ -346,62 +346,64 @@ export default function VendorDashboardPage() {
 
             {/* Active Orders Slider Section (Always On) */}
             <div className="bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-4 md:p-8 border-2 border-slate-100 shadow-sm relative overflow-hidden mt-4">
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-orange-500 rounded-xl text-white">
-                            <Package className="h-5 w-5" />
+                <div className="flex flex-col space-y-4 mb-6 md:mb-8">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-orange-500 rounded-xl text-white shrink-0">
+                                <Package className="h-4 w-4 md:h-5 md:w-5" />
+                            </div>
+                            <h2 className="text-lg md:text-xl font-black text-slate-900">Aktif Siparişler</h2>
                         </div>
-                        <h2 className="text-xl font-black text-slate-900">Aktif Siparişler</h2>
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                            <Badge
-                                className={`border-0 rounded-lg transition-colors cursor-pointer ${!filterStatus ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-                                onClick={() => setFilterStatus(null)}
-                            >
-                                ✨ Tümü
-                            </Badge>
-                            {statusStats.confirmed > 0 && (
-                                <Badge
-                                    className={`border-0 rounded-lg transition-colors cursor-pointer ${filterStatus === 'confirmed' ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
-                                    onClick={() => setFilterStatus(filterStatus === 'confirmed' ? null : 'confirmed')}
-                                >
-                                    📥 {statusStats.confirmed}
-                                </Badge>
-                            )}
-                            {statusStats.preparing > 0 && (
-                                <Badge
-                                    className={`border-0 rounded-lg transition-colors cursor-pointer ${filterStatus === 'preparing' ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-600 hover:bg-orange-100'}`}
-                                    onClick={() => setFilterStatus(filterStatus === 'preparing' ? null : 'preparing')}
-                                >
-                                    🥣 {statusStats.preparing}
-                                </Badge>
-                            )}
-                            {statusStats.completed > 0 && (
-                                <Badge
-                                    className={`border-0 rounded-lg transition-colors cursor-pointer ${filterStatus === 'completed' ? 'bg-cyan-500 text-white' : 'bg-cyan-50 text-cyan-600 hover:bg-cyan-100'}`}
-                                    onClick={() => setFilterStatus(filterStatus === 'completed' ? null : 'completed')}
-                                >
-                                    ✅ {statusStats.completed}
-                                </Badge>
-                            )}
-                            {statusStats.shipped > 0 && (
-                                <Badge
-                                    className={`border-0 rounded-lg transition-colors cursor-pointer ${filterStatus === 'shipped' ? 'bg-purple-500 text-white' : 'bg-purple-50 text-purple-600 hover:bg-purple-100'}`}
-                                    onClick={() => setFilterStatus(filterStatus === 'shipped' ? null : 'shipped')}
-                                >
-                                    🚚 {statusStats.shipped}
-                                </Badge>
-                            )}
-                            {(statusStats.confirmed + statusStats.preparing + statusStats.completed + statusStats.shipped) === 0 && (
-                                <Badge className="bg-slate-100 text-slate-400 border-0 rounded-lg">Sıfır İş</Badge>
-                            )}
-                        </div>
+                        <Link
+                            to="/pastane/siparisler"
+                            className="text-primary text-sm font-bold flex items-center gap-1 hover:underline shrink-0"
+                        >
+                            Tümünü Yönet <ChevronRight className="h-4 w-4" />
+                        </Link>
                     </div>
-                    <Link
-                        to="/pastane/siparisler"
-                        className="text-primary text-sm font-bold flex items-center gap-1 hover:underline"
-                    >
-                        Tümünü Yönet <ChevronRight className="h-4 w-4" />
-                    </Link>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                        <Badge
+                            className={`border-0 rounded-lg transition-colors cursor-pointer text-xs ${!filterStatus ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                            onClick={() => setFilterStatus(null)}
+                        >
+                            ✨ Tümü
+                        </Badge>
+                        {statusStats.confirmed > 0 && (
+                            <Badge
+                                className={`border-0 rounded-lg transition-colors cursor-pointer text-xs ${filterStatus === 'confirmed' ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                                onClick={() => setFilterStatus(filterStatus === 'confirmed' ? null : 'confirmed')}
+                            >
+                                📥 {statusStats.confirmed}
+                            </Badge>
+                        )}
+                        {statusStats.preparing > 0 && (
+                            <Badge
+                                className={`border-0 rounded-lg transition-colors cursor-pointer text-xs ${filterStatus === 'preparing' ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-600 hover:bg-orange-100'}`}
+                                onClick={() => setFilterStatus(filterStatus === 'preparing' ? null : 'preparing')}
+                            >
+                                🥣 {statusStats.preparing}
+                            </Badge>
+                        )}
+                        {statusStats.completed > 0 && (
+                            <Badge
+                                className={`border-0 rounded-lg transition-colors cursor-pointer text-xs ${filterStatus === 'completed' ? 'bg-cyan-500 text-white' : 'bg-cyan-50 text-cyan-600 hover:bg-cyan-100'}`}
+                                onClick={() => setFilterStatus(filterStatus === 'completed' ? null : 'completed')}
+                            >
+                                ✅ {statusStats.completed}
+                            </Badge>
+                        )}
+                        {statusStats.shipped > 0 && (
+                            <Badge
+                                className={`border-0 rounded-lg transition-colors cursor-pointer text-xs ${filterStatus === 'shipped' ? 'bg-purple-500 text-white' : 'bg-purple-50 text-purple-600 hover:bg-purple-100'}`}
+                                onClick={() => setFilterStatus(filterStatus === 'shipped' ? null : 'shipped')}
+                            >
+                                🚚 {statusStats.shipped}
+                            </Badge>
+                        )}
+                        {(statusStats.confirmed + statusStats.preparing + statusStats.completed + statusStats.shipped) === 0 && (
+                            <Badge className="bg-slate-100 text-slate-400 border-0 rounded-lg text-xs">Sıfır İş</Badge>
+                        )}
+                    </div>
                 </div>
 
                 <div className="overflow-x-auto no-scrollbar pb-4 -mx-2">
@@ -484,8 +486,8 @@ export default function VendorDashboardPage() {
 
             {/* Permanent Best Sellers Slider */}
             <div className="bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-4 md:p-8 border-2 border-slate-100 shadow-sm relative overflow-hidden mt-4">
-                <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-xl font-black text-slate-900">En Çok Satan Ürünlerin</h2>
+                <div className="flex items-center justify-between mb-6 md:mb-8">
+                    <h2 className="text-lg md:text-xl font-black text-slate-900 truncate">En Çok Satan Ürünlerin</h2>
                 </div>
                 <div className="overflow-x-auto no-scrollbar pb-4 -mx-2">
                     <div className="flex gap-4 px-2">
