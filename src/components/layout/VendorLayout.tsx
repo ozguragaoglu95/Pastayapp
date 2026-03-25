@@ -80,9 +80,6 @@ export default function VendorLayout() {
             <div className="flex-1 flex flex-col">
                 <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-lg border-b border-border h-14 flex items-center justify-between px-6">
                     <div className="flex items-center gap-4">
-                        <Link to="/" className="md:hidden">
-                            <Home className="h-5 w-5 text-primary" />
-                        </Link>
                         <span className="font-display font-bold text-lg md:hidden">🎂 Pastane</span>
 
                         <Button variant="ghost" size="sm" asChild className="hidden md:flex text-muted-foreground hover:text-primary font-bold">

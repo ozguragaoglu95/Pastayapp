@@ -27,11 +27,6 @@ export default function Header() {
         <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-lg border-b border-border">
             <div className="flex items-center justify-between h-16 px-4 max-w-7xl mx-auto">
                 <div className="flex items-center gap-2">
-                    {/* Back Button */}
-                    <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="md:hidden">
-                        <ArrowLeft className="h-5 w-5" />
-                    </Button>
-                    
                     <Link to={user?.role === 'vendor' ? '/pastane/panel' : '/'} className="font-display font-bold text-xl text-gradient hidden md:block">
                         Pastayapp
                     </Link>

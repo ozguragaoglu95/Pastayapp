@@ -223,7 +223,7 @@ export default function VendorDashboardPage() {
             </div>
 
             {/* Dynamic Slider Section */}
-            <div className="bg-white rounded-[2.5rem] p-8 border-2 border-slate-100 shadow-sm relative overflow-hidden">
+            <div className="bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-4 md:p-8 border-2 border-slate-100 shadow-sm relative overflow-hidden">
                 <div className="flex items-center justify-between mb-8">
                     <h2 className="text-xl font-black text-slate-900">
                         {activeTab === 'marketplace' && "Genel İstekler (Pazar Yeri)"}
@@ -253,7 +253,7 @@ export default function VendorDashboardPage() {
                                 {activeTab === 'marketplace' && (
                                     marketplaceRequests.length > 0 ? (
                                         marketplaceRequests.map(req => (
-                                            <Card key={req.id} className="min-w-[280px] rounded-3xl border-0 shadow-sm bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer" onClick={() => navigate(`/pastane/talep/${req.id}`)}>
+                                            <Card key={req.id} className="min-w-[240px] md:min-w-[280px] rounded-2xl md:rounded-3xl border-0 shadow-sm bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer" onClick={() => navigate(`/pastane/talep/${req.id}`)}>
                                                 <CardContent className="p-5 flex flex-col justify-between h-full">
                                                     <div className="space-y-3">
                                                         <Badge className="bg-primary/10 text-primary border-0 rounded-lg capitalize">{req.spec.occasion.replace("_", " ")}</Badge>
@@ -345,7 +345,7 @@ export default function VendorDashboardPage() {
             </div>
 
             {/* Active Orders Slider Section (Always On) */}
-            <div className="bg-white rounded-[2.5rem] p-8 border-2 border-slate-100 shadow-sm relative overflow-hidden mt-4">
+            <div className="bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-4 md:p-8 border-2 border-slate-100 shadow-sm relative overflow-hidden mt-4">
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-orange-500 rounded-xl text-white">
@@ -408,7 +408,7 @@ export default function VendorDashboardPage() {
                     <div className="flex gap-4 px-2">
                         {sliderOrders.length > 0 ? (
                             sliderOrders.map(order => (
-                                <Card key={order.id} className="min-w-[280px] rounded-3xl border-0 shadow-sm bg-slate-50 border-2 border-transparent hover:border-orange-200 transition-all group overflow-hidden">
+                                <Card key={order.id} className="min-w-[240px] md:min-w-[280px] rounded-2xl md:rounded-3xl border-0 shadow-sm bg-slate-50 border-2 border-transparent hover:border-orange-200 transition-all group overflow-hidden">
                                     <div className="p-5 flex flex-col justify-between h-full space-y-4">
                                         <div className="flex justify-between items-start">
                                             <div className="space-y-1">
@@ -462,7 +462,7 @@ export default function VendorDashboardPage() {
             <div className="flex flex-col gap-4 mt-4">
                 <button
                     onClick={() => navigate("/pastane/urun-ekle")}
-                    className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-[2.5rem] p-8 flex flex-col items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] group shadow-xl shadow-slate-200"
+                    className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-8 flex flex-col items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] group shadow-xl shadow-slate-200"
                 >
                     <div className="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center transition-all group-hover:scale-110 group-hover:rotate-12">
                         <Plus className="h-6 w-6" />
@@ -483,7 +483,7 @@ export default function VendorDashboardPage() {
             </div>
 
             {/* Permanent Best Sellers Slider */}
-            <div className="bg-white rounded-[2.5rem] p-8 border-2 border-slate-100 shadow-sm relative overflow-hidden mt-4">
+            <div className="bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-4 md:p-8 border-2 border-slate-100 shadow-sm relative overflow-hidden mt-4">
                 <div className="flex items-center justify-between mb-8">
                     <h2 className="text-xl font-black text-slate-900">En Çok Satan Ürünlerin</h2>
                 </div>
